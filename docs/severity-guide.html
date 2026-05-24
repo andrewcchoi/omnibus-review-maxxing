@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Severity Classification Guide - Omnibus Review</title>
+    <style>
+        :root {
+            --critical: #dc3545;
+            --high: #fd7e14;
+            --medium: #ffc107;
+            --low: #0d6efd;
+            --success: #198754;
+            --background: #f8f9fa;
+            --text: #212529;
+            --border: #dee2e6;
+            --code-bg: #f5f5f5;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--background);
+            margin: 0;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            color: var(--text);
+        }
+
+        h2 {
+            color: var(--text);
+            margin-top: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        h3 {
+            margin-top: 20px;
+        }
+
+        section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .severity-card {
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 6px solid;
+        }
+
+        .severity-critical {
+            background: #f8d7da;
+            border-color: var(--critical);
+        }
+
+        .severity-high {
+            background: #ffe5d0;
+            border-color: var(--high);
+        }
+
+        .severity-medium {
+            background: #fff3cd;
+            border-color: var(--medium);
+        }
+
+        .severity-low {
+            background: #cfe2ff;
+            border-color: var(--low);
+        }
+
+        .severity-card h3 {
+            margin-top: 0;
+        }
+
+        .severity-critical h3 { color: var(--critical); }
+        .severity-high h3 { color: var(--high); }
+        .severity-medium h3 { color: var(--medium); color: #856404; }
+        .severity-low h3 { color: var(--low); }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 14px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin-right: 8px;
+            color: white;
+        }
+
+        .badge-critical { background: var(--critical); }
+        .badge-high { background: var(--high); }
+        .badge-medium { background: var(--medium); color: var(--text); }
+        .badge-low { background: var(--low); }
+
+        .example {
+            background: var(--code-bg);
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 3px solid var(--border);
+        }
+
+        .example-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        code {
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--background);
+            font-weight: 600;
+        }
+
+        .nav-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--low);
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+
+        .matrix {
+            display: grid;
+            grid-template-columns: auto 1fr 1fr 1fr;
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            margin: 20px 0;
+        }
+
+        .matrix-cell {
+            background: white;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .matrix-header {
+            background: var(--background);
+            font-weight: 600;
+        }
+
+        .confidence-bar {
+            height: 20px;
+            background: var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--critical), var(--high), var(--medium), var(--success));
+            transition: width 0.3s;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            section, header {
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Severity Classification Guide</h1>
+        <p>How Omnibus Review assigns and interprets issue severity levels</p>
+    </header>
+
+    <a href="../README.html" class="nav-link">← Back to README</a>
+
+    <section>
+        <h2>Severity Levels Overview</h2>
+        <p>
+            Omnibus Review classifies all findings into four severity levels based on impact,
+            exploitability, and urgency. Each level has specific characteristics and recommended
+            actions.
+        </p>
+
+        <div class="severity-card severity-critical">
+            <h3><span class="badge badge-critical">CRITICAL</span> Immediate Action Required</h3>
+            <p><strong>Timeline:</strong> Fix immediately, do not merge</p>
+            <p><strong>Typical Issues:</strong></p>
+            <ul>
+                <li>Remote code execution vulnerabilities</li>
+                <li>SQL injection, command injection</li>
+                <li>Authentication bypass</li>
+                <li>Hardcoded credentials in production code</li>
+                <li>Data loss scenarios (destructive operations without safeguards)</li>
+                <li>Production-breaking bugs in critical paths</li>
+            </ul>
+            <p><strong>Auto-fix:</strong> Attempted automatically with <code>--fix</code> flag</p>
+        </div>
+
+        <div class="severity-card severity-high">
+            <h3><span class="badge badge-high">HIGH</span> Fix Before Merge</h3>
+            <p><strong>Timeline:</strong> Must fix before merging to main/production</p>
+            <p><strong>Typical Issues:</strong></p>
+            <ul>
+                <li>Cross-site scripting (XSS)</li>
+                <li>Insecure deserialization</li>
+                <li>Missing authorization checks</li>
+                <li>Logic errors causing incorrect behavior</li>
+                <li>N+1 query problems affecting performance</li>
+                <li>Resource exhaustion vulnerabilities</li>
+                <li>Unhandled exceptions in main flows</li>
+            </ul>
+            <p><strong>Auto-fix:</strong> Attempted automatically with <code>--fix</code> flag</p>
+        </div>
+
+        <div class="severity-card severity-medium">
+            <h3><span class="badge badge-medium">MEDIUM</span> Fix Soon</h3>
+            <p><strong>Timeline:</strong> Fix within current sprint or before next release</p>
+            <p><strong>Typical Issues:</strong></p>
+            <ul>
+                <li>Missing input validation (low-risk endpoints)</li>
+                <li>Inefficient algorithms in non-critical paths</li>
+                <li>Test coverage gaps</li>
+                <li>Code duplication</li>
+                <li>Missing error handling in edge cases</li>
+                <li>Suboptimal database queries</li>
+                <li>Architectural violations (minor)</li>
+            </ul>
+            <p><strong>Auto-fix:</strong> Not attempted by default</p>
+        </div>
+
+        <div class="severity-card severity-low">
+            <h3><span class="badge badge-low">LOW</span> Consider Fixing</h3>
+            <p><strong>Timeline:</strong> Fix when convenient, consider technical debt backlog</p>
+            <p><strong>Typical Issues:</strong></p>
+            <ul>
+                <li>Style inconsistencies</li>
+                <li>Missing documentation</li>
+                <li>TODO comments</li>
+                <li>Overly complex but working code</li>
+                <li>Minor performance optimizations</li>
+                <li>Unused imports or variables</li>
+                <li>Suggestions for future improvements</li>
+            </ul>
+            <p><strong>Auto-fix:</strong> Not attempted</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Severity Assignment Matrix</h2>
+        <p>
+            Severity is determined by evaluating two dimensions: <strong>Impact</strong> (what happens if exploited)
+            and <strong>Exploitability</strong> (how easy is it to trigger).
+        </p>
+
+        <div class="matrix">
+            <div class="matrix-cell matrix-header"></div>
+            <div class="matrix-cell matrix-header">High Exploitability</div>
+            <div class="matrix-cell matrix-header">Medium Exploitability</div>
+            <div class="matrix-cell matrix-header">Low Exploitability</div>
+
+            <div class="matrix-cell matrix-header">Critical Impact</div>
+            <div class="matrix-cell" style="background: #f8d7da; font-weight: bold;">CRITICAL</div>
+            <div class="matrix-cell" style="background: #ffe5d0; font-weight: bold;">HIGH</div>
+            <div class="matrix-cell" style="background: #ffe5d0; font-weight: bold;">HIGH</div>
+
+            <div class="matrix-cell matrix-header">High Impact</div>
+            <div class="matrix-cell" style="background: #ffe5d0; font-weight: bold;">HIGH</div>
+            <div class="matrix-cell" style="background: #ffe5d0; font-weight: bold;">HIGH</div>
+            <div class="matrix-cell" style="background: #fff3cd; font-weight: bold;">MEDIUM</div>
+
+            <div class="matrix-cell matrix-header">Medium Impact</div>
+            <div class="matrix-cell" style="background: #ffe5d0; font-weight: bold;">HIGH</div>
+            <div class="matrix-cell" style="background: #fff3cd; font-weight: bold;">MEDIUM</div>
+            <div class="matrix-cell" style="background: #cfe2ff; font-weight: bold;">LOW</div>
+
+            <div class="matrix-cell matrix-header">Low Impact</div>
+            <div class="matrix-cell" style="background: #fff3cd; font-weight: bold;">MEDIUM</div>
+            <div class="matrix-cell" style="background: #cfe2ff; font-weight: bold;">LOW</div>
+            <div class="matrix-cell" style="background: #cfe2ff; font-weight: bold;">LOW</div>
+        </div>
+
+        <h3>Impact Definitions</h3>
+        <ul>
+            <li><strong>Critical Impact:</strong> System compromise, data breach, financial loss, or complete service outage</li>
+            <li><strong>High Impact:</strong> Feature malfunction, data corruption, significant performance degradation</li>
+            <li><strong>Medium Impact:</strong> Minor functionality issues, user experience problems, maintainability concerns</li>
+            <li><strong>Low Impact:</strong> Cosmetic issues, code quality concerns, documentation gaps</li>
+        </ul>
+
+        <h3>Exploitability Definitions</h3>
+        <ul>
+            <li><strong>High:</strong> Trivial to exploit, affects common paths, no authentication required</li>
+            <li><strong>Medium:</strong> Requires specific conditions, authenticated access, or unusual input</li>
+            <li><strong>Low:</strong> Complex exploitation, requires privileged access, or very rare conditions</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Detailed Examples by Category</h2>
+
+        <h3>Security Issues</h3>
+
+        <div class="example">
+            <div class="example-title"><span class="badge badge-critical">CRITICAL</span> SQL Injection</div>
+            <code>query = f"SELECT * FROM users WHERE id = {user_id}"</code>
+            <p><strong>Why Critical:</strong> Direct database access, trivial to exploit, high impact</p>
+            <p><strong>Fix:</strong> Use parameterized queries</p>
+        </div>
+
+        <div class="example">
+            <div class="example-title"><span class="badge badge-high">HIGH</span> XSS Vulnerability</div>
+            <code>return f"&lt;div&gt;Hello {username}&lt;/div&gt;"</code>
+            <p><strong>Why High:</strong> User impact, easy to exploit, but limited scope</p>
+            <p><strong>Fix:</strong> HTML escape user input</p>
+        </div>
+
+        <div class="example">
+            <div class="example-title"><span class="badge badge-medium">MEDIUM</span> Weak Password Policy</div>
+            <code>min_password_length = 6</code>
+            <p><strong>Why Medium:</strong> Security concern but requires user cooperation to exploit</p>
+            <p><strong>Fix:</strong> Increase minimum to 12+ characters</p>
+        </div>
+
+        <div class="example">
+            <div class="example-title"><span class="badge badge-low">LOW</span> Missing Security Headers</div>
+            <code>// No X-Frame-Options header</code>
+            <p><strong>Why Low:</strong> Defense-in-depth measure, low immediate risk</p>
+            <p><strong>Fix:</strong> Add security headers middleware</p>
+        </div>
+
+        <h3>Correctness Issues</h3>
+
+        <div class="example">
+            <div class="example-title"><span class="badge badge-critical">CRITICAL</span> Data Loss</div>
+            <code>await session.delete(user)  # No safeguards or confirmation</code>
+            <p><strong>Why Critical:</strong> Irreversible data destruction</p>
+            <p><strong>Fix:</strong> Add soft-delete or confirmation mechanism</p>
+        </div>
+
+        <div class="example">
+            <div class="example-title"><span class="badge badge-high">HIGH</span> Off-by-One Error</div>
+            <code>for i in range(len(items)):  # Missing last item</code>
+            <p><strong>Why High:</strong> Logic error causing incorrect results</p>
+            <p><strong>Fix:</strong> Use correct range or iterate directly</p>
+        </div>
+
+        <div class="example">
+            <div class="example-title"><span class="badge badge-medium">MEDIUM</span> Unhandled Exception</div>
+            <code>result = json.loads(response.text)  # May raise ValueError</code>
+            <p><strong>Why Medium:</strong> Edge case that crashes feature</p>
+            <p><strong>Fix:</strong> Add try/except with appropriate handling</p>
+        </div>
+
+        <div class="example">
+            <div class="example-title"><span class="badge badge-low">LOW</span> Unused Variable</div>
+            <code>temp = calculate_value()  # Never used</code>
+            <p><strong>Why Low:</strong> Code smell, no functional impact</p>
+            <p><strong>Fix:</strong> Remove unused code</p>
+        </div>
+
+        <h3>Performance Issues</h3>
+
+        <div class="example">
+            <div class="example-title"><span class="badge badge-high">HIGH</span> N+1 Query</div>
+            <code>for user in users: print(user.profile.name)  # Query per user</code>
+            <p><strong>Why High:</strong> Causes timeout/crash with many users</p>
+            <p><strong>Fix:</strong> Use eager loading or join</p>
+        </div>
+
+        <div class="example">
+            <div class="example-title"><span class="badge badge-medium">MEDIUM</span> Missing Index</div>
+            <code>SELECT * FROM logs WHERE user_id = ?  # No index on user_id</code>
+            <p><strong>Why Medium:</strong> Slow queries but not breaking</p>
+            <p><strong>Fix:</strong> Add database index</p>
+        </div>
+
+        <div class="example">
+            <div class="example-title"><span class="badge badge-low">LOW</span> Inefficient Sort</div>
+            <code>items.sort(key=lambda x: expensive_fn(x))  # Called repeatedly</code>
+            <p><strong>Why Low:</strong> Micro-optimization, minor impact</p>
+            <p><strong>Fix:</strong> Cache expensive_fn results</p>
+        </div>
+
+        <h3>Architecture Issues</h3>
+
+        <div class="example">
+            <div class="example-title"><span class="badge badge-high">HIGH</span> Circular Dependency</div>
+            <code>from module_a import X  # module_a also imports from this file</code>
+            <p><strong>Why High:</strong> Breaks modularity, hard to test/maintain</p>
+            <p><strong>Fix:</strong> Refactor to remove circular reference</p>
+        </div>
+
+        <div class="example">
+            <div class="example-title"><span class="badge badge-medium">MEDIUM</span> God Object</div>
+            <code>class Manager: # 50+ methods, 2000+ lines</code>
+            <p><strong>Why Medium:</strong> Maintainability issue, not immediate bug</p>
+            <p><strong>Fix:</strong> Split into focused classes</p>
+        </div>
+
+        <div class="example">
+            <div class="example-title"><span class="badge badge-low">LOW</span> Missing Abstraction</div>
+            <code>if user.role == "admin": ...  # Repeated across codebase</code>
+            <p><strong>Why Low:</strong> Code quality issue, suggests refactor</p>
+            <p><strong>Fix:</strong> Create has_permission() method</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Confidence Thresholds</h2>
+
+        <p>
+            Each finding includes a confidence score (0.0-1.0) representing how certain the
+            agent is that the issue is real and not a false positive.
+        </p>
+
+        <div style="margin: 30px 0;">
+            <div style="margin: 15px 0;">
+                <strong>0.9 - 1.0 Very High Confidence</strong>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" style="width: 95%; background: var(--success);"></div>
+                </div>
+                <p>Clear violation, well-established pattern, agent has high certainty</p>
+            </div>
+
+            <div style="margin: 15px 0;">
+                <strong>0.8 - 0.9 High Confidence</strong>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" style="width: 85%; background: var(--low);"></div>
+                </div>
+                <p>Strong evidence, minor possibility of false positive</p>
+            </div>
+
+            <div style="margin: 15px 0;">
+                <strong>0.7 - 0.8 Moderate Confidence (Default Threshold)</strong>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" style="width: 75%; background: var(--medium);"></div>
+                </div>
+                <p>Likely issue, requires human review to confirm</p>
+            </div>
+
+            <div style="margin: 15px 0;">
+                <strong>0.6 - 0.7 Low Confidence</strong>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" style="width: 65%; background: var(--high);"></div>
+                </div>
+                <p>Possible issue, higher false positive rate - filtered by default</p>
+            </div>
+
+            <div style="margin: 15px 0;">
+                <strong>&lt; 0.6 Very Low Confidence</strong>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" style="width: 50%; background: var(--critical);"></div>
+                </div>
+                <p>Speculative finding, likely false positive - filtered by default</p>
+            </div>
+        </div>
+
+        <h3>Adjusting Confidence Threshold</h3>
+        <p>Use the <code>--confidence</code> flag to adjust filtering:</p>
+        <ul>
+            <li><code>--confidence 0.9</code> - Highest quality, fewest findings</li>
+            <li><code>--confidence 0.7</code> - Default balanced setting</li>
+            <li><code>--confidence 0.5</code> - Aggressive, more false positives</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Severity Upgrading Rules</h2>
+
+        <p>
+            The aggregator may upgrade severity when multiple agents independently identify
+            the same issue or related issues that compound impact.
+        </p>
+
+        <h3>Multi-Agent Agreement</h3>
+        <ul>
+            <li><strong>2 agents agree:</strong> +1 confidence, consider severity upgrade</li>
+            <li><strong>3+ agents agree:</strong> +0.15 confidence, upgrade severity one level if near boundary</li>
+            <li><strong>Security + Correctness agree:</strong> Strong signal, prioritize highly</li>
+        </ul>
+
+        <h3>Compound Issues</h3>
+        <p>Related issues that together create higher risk:</p>
+        <ul>
+            <li>Missing validation + database query = potential injection (upgrade to HIGH/CRITICAL)</li>
+            <li>Multiple auth bypass paths = systemic issue (upgrade severity)</li>
+            <li>Performance issue in hot path = user-facing impact (upgrade to HIGH)</li>
+        </ul>
+
+        <h3>Context-Based Adjustments</h3>
+        <ul>
+            <li><strong>Production code:</strong> Upgrade severity for user-facing issues</li>
+            <li><strong>Test code:</strong> Downgrade severity (less critical than production)</li>
+            <li><strong>Public API:</strong> Upgrade security findings (larger attack surface)</li>
+            <li><strong>Internal tools:</strong> Downgrade if not exposed externally</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Reporting Thresholds</h2>
+
+        <p>Control which severities appear in final report:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Flag</th>
+                    <th>Reports</th>
+                    <th>Use Case</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><code>--min-severity critical</code></td>
+                    <td>CRITICAL only</td>
+                    <td>Emergency audits, hotfix validation</td>
+                </tr>
+                <tr>
+                    <td><code>--min-severity high</code></td>
+                    <td>CRITICAL + HIGH</td>
+                    <td>Pre-merge quick check</td>
+                </tr>
+                <tr>
+                    <td><code>--min-severity medium</code></td>
+                    <td>CRITICAL + HIGH + MEDIUM</td>
+                    <td>Sprint planning, technical debt</td>
+                </tr>
+                <tr>
+                    <td><code>--min-severity low</code> (default)</td>
+                    <td>All findings</td>
+                    <td>Comprehensive review</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <footer style="margin-top: 40px; padding: 20px; text-align: center; color: #6c757d; border-top: 1px solid var(--border);">
+        <p><a href="../README.html" style="color: var(--low);">Back to README</a></p>
+    </footer>
+</body>
+</html>

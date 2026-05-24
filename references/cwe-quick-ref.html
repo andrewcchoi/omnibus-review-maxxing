@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CWE Quick Reference - Omnibus Review</title>
+    <style>
+        :root {
+            --critical: #dc3545;
+            --high: #fd7e14;
+            --medium: #ffc107;
+            --low: #0d6efd;
+            --success: #198754;
+            --background: #f8f9fa;
+            --text: #212529;
+            --border: #dee2e6;
+            --code-bg: #f5f5f5;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--background);
+            margin: 0;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            color: var(--text);
+        }
+
+        h2 {
+            color: var(--text);
+            margin-top: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .cwe-card {
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            transition: box-shadow 0.2s;
+        }
+
+        .cwe-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .cwe-critical { border-left: 6px solid var(--critical); }
+        .cwe-high { border-left: 6px solid var(--high); }
+        .cwe-medium { border-left: 6px solid var(--medium); }
+        .cwe-low { border-left: 6px solid var(--low); }
+
+        .cwe-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .cwe-id {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--text);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 14px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: white;
+        }
+
+        .badge-critical { background: var(--critical); }
+        .badge-high { background: var(--high); }
+        .badge-medium { background: var(--medium); color: var(--text); }
+        .badge-low { background: var(--low); }
+
+        .cwe-description {
+            margin: 15px 0;
+            line-height: 1.7;
+        }
+
+        .cwe-example {
+            background: var(--code-bg);
+            padding: 12px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            border-left: 3px solid var(--border);
+        }
+
+        .cwe-remediation {
+            background: #d1e7dd;
+            padding: 12px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 3px solid var(--success);
+        }
+
+        .cwe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        code {
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .nav-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--low);
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+
+        .category-section {
+            margin: 30px 0;
+        }
+
+        .owasp-link {
+            display: inline-block;
+            background: var(--low);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .owasp-link:hover {
+            background: #0a58ca;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--background);
+            font-weight: 600;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            section, header {
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+            .cwe-card {
+                page-break-inside: avoid;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .cwe-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>CWE Quick Reference</h1>
+        <p>Common Weakness Enumeration guide for security vulnerability identification and remediation</p>
+    </header>
+
+    <a href="../README.html" class="nav-link">← Back to README</a>
+
+    <section>
+        <h2>About CWE</h2>
+        <p>
+            Common Weakness Enumeration (CWE) is a community-developed list of software and hardware weakness types.
+            It serves as a common language for describing security vulnerabilities and provides a baseline for
+            weakness identification, mitigation, and prevention efforts.
+        </p>
+        <p>
+            <strong>Maintained by:</strong> MITRE Corporation<br>
+            <strong>Official Site:</strong> <a href="https://cwe.mitre.org" target="_blank">https://cwe.mitre.org</a><br>
+            <strong>Used in:</strong> CVE entries, security tools, compliance frameworks
+        </p>
+    </section>
+
+    <section class="category-section">
+        <h2>OWASP Top 10 - Mapped CWEs</h2>
+        <p>Most common web application security risks and their associated CWEs</p>
+
+        <div class="cwe-grid">
+            <div class="cwe-card cwe-critical">
+                <div class="cwe-header">
+                    <div class="cwe-id">CWE-89</div>
+                    <span class="badge badge-critical">CRITICAL</span>
+                </div>
+                <h3>SQL Injection</h3>
+                <div class="cwe-description">
+                    <strong>OWASP:</strong> A03:2021 - Injection<br>
+                    <strong>Description:</strong> Software constructs SQL queries from user input without proper
+                    neutralization, allowing attackers to modify query structure.
+                </div>
+                <div class="cwe-example">
+                    <strong>Vulnerable Code:</strong><br>
+                    query = f"SELECT * FROM users WHERE id = {user_id}"<br>
+                    cursor.execute(query)
+                </div>
+                <div class="cwe-remediation">
+                    <strong>Remediation:</strong><br>
+                    • Use parameterized queries or prepared statements<br>
+                    • Use ORM frameworks with built-in protections<br>
+                    • Validate and sanitize all inputs<br>
+                    • Apply principle of least privilege to database accounts
+                </div>
+            </div>
+
+            <div class="cwe-card cwe-critical">
+                <div class="cwe-header">
+                    <div class="cwe-id">CWE-78</div>
+                    <span class="badge badge-critical">CRITICAL</span>
+                </div>
+                <h3>OS Command Injection</h3>
+                <div class="cwe-description">
+                    <strong>OWASP:</strong> A03:2021 - Injection<br>
+                    <strong>Description:</strong> Application executes OS commands constructed from user input,
+                    allowing attackers to execute arbitrary system commands.
+                </div>
+                <div class="cwe-example">
+                    <strong>Vulnerable Code:</strong><br>
+                    import os<br>
+                    os.system(f"ping {user_input}")
+                </div>
+                <div class="cwe-remediation">
+                    <strong>Remediation:</strong><br>
+                    • Use subprocess with argument lists, never shell=True<br>
+                    • Validate input against strict whitelist<br>
+                    • Use libraries instead of shell commands when possible<br>
+                    • Run with minimal privileges
+                </div>
+            </div>
+
+            <div class="cwe-card cwe-critical">
+                <div class="cwe-header">
+                    <div class="cwe-id">CWE-79</div>
+                    <span class="badge badge-high">HIGH</span>
+                </div>
+                <h3>Cross-Site Scripting (XSS)</h3>
+                <div class="cwe-description">
+                    <strong>OWASP:</strong> A03:2021 - Injection<br>
+                    <strong>Description:</strong> Application includes untrusted data in web page without proper
+                    validation or escaping, allowing attackers to execute scripts in victim's browser.
+                </div>
+                <div class="cwe-example">
+                    <strong>Vulnerable Code:</strong><br>
+                    return f"&lt;div&gt;Hello {username}&lt;/div&gt;"
+                </div>
+                <div class="cwe-remediation">
+                    <strong>Remediation:</strong><br>
+                    • HTML-escape all user input in templates<br>
+                    • Use Content Security Policy (CSP) headers<br>
+                    • Use auto-escaping template engines<br>
+                    • Validate input on server side
+                </div>
+            </div>
+
+            <div class="cwe-card cwe-critical">
+                <div class="cwe-header">
+                    <div class="cwe-id">CWE-798</div>
+                    <span class="badge badge-critical">CRITICAL</span>
+                </div>
+                <h3>Use of Hard-coded Credentials</h3>
+                <div class="cwe-description">
+                    <strong>OWASP:</strong> A07:2021 - Identification and Authentication Failures<br>
+                    <strong>Description:</strong> Software contains hard-coded credentials (passwords, API keys)
+                    that cannot be changed without code modification.
+                </div>
+                <div class="cwe-example">
+                    <strong>Vulnerable Code:</strong><br>
+                    API_KEY = "sk_live_abc123xyz789"<br>
+                    DB_PASSWORD = "admin123"
+                </div>
+                <div class="cwe-remediation">
+                    <strong>Remediation:</strong><br>
+                    • Use environment variables for all secrets<br>
+                    • Use secret management systems (Vault, AWS Secrets Manager)<br>
+                    • Rotate exposed credentials immediately<br>
+                    • Never commit secrets to version control
+                </div>
+            </div>
+
+            <div class="cwe-card cwe-high">
+                <div class="cwe-header">
+                    <div class="cwe-id">CWE-862</div>
+                    <span class="badge badge-high">HIGH</span>
+                </div>
+                <h3>Missing Authorization</h3>
+                <div class="cwe-description">
+                    <strong>OWASP:</strong> A01:2021 - Broken Access Control<br>
+                    <strong>Description:</strong> Software does not perform authorization checks for sensitive
+                    operations, allowing unauthorized access.
+                </div>
+                <div class="cwe-example">
+                    <strong>Vulnerable Code:</strong><br>
+                    @app.delete("/users/{user_id}")<br>
+                    async def delete_user(user_id: int):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;# No check if current user can delete this user<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;await user_repo.delete(user_id)
+                </div>
+                <div class="cwe-remediation">
+                    <strong>Remediation:</strong><br>
+                    • Implement authorization checks on all sensitive endpoints<br>
+                    • Use role-based access control (RBAC)<br>
+                    • Deny by default, explicitly allow<br>
+                    • Test authorization boundaries
+                </div>
+            </div>
+
+            <div class="cwe-card cwe-high">
+                <div class="cwe-header">
+                    <div class="cwe-id">CWE-502</div>
+                    <span class="badge badge-high">HIGH</span>
+                </div>
+                <h3>Deserialization of Untrusted Data</h3>
+                <div class="cwe-description">
+                    <strong>OWASP:</strong> A08:2021 - Software and Data Integrity Failures<br>
+                    <strong>Description:</strong> Application deserializes untrusted data without verification,
+                    potentially allowing code execution or data tampering.
+                </div>
+                <div class="cwe-example">
+                    <strong>Vulnerable Code:</strong><br>
+                    import pickle<br>
+                    data = pickle.loads(user_input)  # DANGEROUS
+                </div>
+                <div class="cwe-remediation">
+                    <strong>Remediation:</strong><br>
+                    • Never deserialize untrusted data<br>
+                    • Use safe formats (JSON) instead of pickle/marshal<br>
+                    • Validate deserialized object structure<br>
+                    • Use digital signatures for serialized data
+                </div>
+            </div>
+
+            <div class="cwe-card cwe-high">
+                <div class="cwe-header">
+                    <div class="cwe-id">CWE-287</div>
+                    <span class="badge badge-high">HIGH</span>
+                </div>
+                <h3>Improper Authentication</h3>
+                <div class="cwe-description">
+                    <strong>OWASP:</strong> A07:2021 - Identification and Authentication Failures<br>
+                    <strong>Description:</strong> Authentication mechanism can be bypassed or is insufficiently robust.
+                </div>
+                <div class="cwe-example">
+                    <strong>Vulnerable Code:</strong><br>
+                    if password == stored_password:  # Plain text comparison<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;login_user()
+                </div>
+                <div class="cwe-remediation">
+                    <strong>Remediation:</strong><br>
+                    • Use bcrypt/argon2 for password hashing<br>
+                    • Implement multi-factor authentication<br>
+                    • Use secure session management<br>
+                    • Implement account lockout after failed attempts
+                </div>
+            </div>
+
+            <div class="cwe-card cwe-high">
+                <div class="cwe-header">
+                    <div class="cwe-id">CWE-327</div>
+                    <span class="badge badge-high">HIGH</span>
+                </div>
+                <h3>Use of Broken/Risky Cryptographic Algorithm</h3>
+                <div class="cwe-description">
+                    <strong>OWASP:</strong> A02:2021 - Cryptographic Failures<br>
+                    <strong>Description:</strong> Software uses weak or broken cryptographic algorithms that can be broken.
+                </div>
+                <div class="cwe-example">
+                    <strong>Vulnerable Code:</strong><br>
+                    import hashlib<br>
+                    hash = hashlib.md5(password)  # MD5 is broken<br>
+                    hash = hashlib.sha1(password)  # SHA1 is weak
+                </div>
+                <div class="cwe-remediation">
+                    <strong>Remediation:</strong><br>
+                    • Use bcrypt, scrypt, or argon2 for passwords<br>
+                    • Use SHA-256 or SHA-3 for hashing<br>
+                    • Use AES-256 for encryption<br>
+                    • Keep crypto libraries updated
+                </div>
+            </div>
+
+            <div class="cwe-card cwe-medium">
+                <div class="cwe-header">
+                    <div class="cwe-id">CWE-306</div>
+                    <span class="badge badge-high">HIGH</span>
+                </div>
+                <h3>Missing Authentication for Critical Function</h3>
+                <div class="cwe-description">
+                    <strong>OWASP:</strong> A07:2021 - Identification and Authentication Failures<br>
+                    <strong>Description:</strong> Critical functionality lacks authentication requirement,
+                    allowing anonymous access.
+                </div>
+                <div class="cwe-example">
+                    <strong>Vulnerable Code:</strong><br>
+                    @app.post("/admin/delete-all-users")<br>
+                    async def delete_all():  # No auth check!<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;await user_repo.delete_all()
+                </div>
+                <div class="cwe-remediation">
+                    <strong>Remediation:</strong><br>
+                    • Require authentication for all non-public endpoints<br>
+                    • Use authentication middleware/decorators<br>
+                    • Default to authenticated, explicitly mark public routes<br>
+                    • Audit all endpoints for auth requirements
+                </div>
+            </div>
+
+            <div class="cwe-card cwe-medium">
+                <div class="cwe-header">
+                    <div class="cwe-id">CWE-352</div>
+                    <span class="badge badge-medium">MEDIUM</span>
+                </div>
+                <h3>Cross-Site Request Forgery (CSRF)</h3>
+                <div class="cwe-description">
+                    <strong>OWASP:</strong> A01:2021 - Broken Access Control<br>
+                    <strong>Description:</strong> Application does not verify that requests come from legitimate
+                    users, allowing forged requests.
+                </div>
+                <div class="cwe-example">
+                    <strong>Vulnerable Code:</strong><br>
+                    @app.post("/transfer-money")  # No CSRF protection<br>
+                    async def transfer(amount, to_account):<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;process_transfer(amount, to_account)
+                </div>
+                <div class="cwe-remediation">
+                    <strong>Remediation:</strong><br>
+                    • Use CSRF tokens for state-changing operations<br>
+                    • Use SameSite cookie attribute<br>
+                    • Verify Origin/Referer headers<br>
+                    • Use framework CSRF protection (Django, Flask-WTF)
+                </div>
+            </div>
+
+            <div class="cwe-card cwe-medium">
+                <div class="cwe-header">
+                    <div class="cwe-id">CWE-916</div>
+                    <span class="badge badge-medium">MEDIUM</span>
+                </div>
+                <h3>Use of Password Hash with Insufficient Computational Effort</h3>
+                <div class="cwe-description">
+                    <strong>OWASP:</strong> A02:2021 - Cryptographic Failures<br>
+                    <strong>Description:</strong> Password hash can be cracked quickly due to low computational cost.
+                </div>
+                <div class="cwe-example">
+                    <strong>Vulnerable Code:</strong><br>
+                    hash = hashlib.sha256(password).hexdigest()  # Too fast!<br>
+                    bcrypt.hashpw(pw, bcrypt.gensalt(rounds=4))  # Too few rounds
+                </div>
+                <div class="cwe-remediation">
+                    <strong>Remediation:</strong><br>
+                    • Use bcrypt with 12+ rounds<br>
+                    • Use argon2id (current best practice)<br>
+                    • Use scrypt with high parameters<br>
+                    • Regularly increase work factor as hardware improves
+                </div>
+            </div>
+
+            <div class="cwe-card cwe-medium">
+                <div class="cwe-header">
+                    <div class="cwe-id">CWE-200</div>
+                    <span class="badge badge-medium">MEDIUM</span>
+                </div>
+                <h3>Exposure of Sensitive Information</h3>
+                <div class="cwe-description">
+                    <strong>OWASP:</strong> A02:2021 - Cryptographic Failures<br>
+                    <strong>Description:</strong> Software exposes sensitive information to unauthorized actors
+                    through various means.
+                </div>
+                <div class="cwe-example">
+                    <strong>Vulnerable Code:</strong><br>
+                    return {"user": user, "password_hash": user.password}  # Exposed<br>
+                    logging.info(f"Login failed for {email} with {password}")  # Logged
+                </div>
+                <div class="cwe-remediation">
+                    <strong>Remediation:</strong><br>
+                    • Never return sensitive fields in API responses<br>
+                    • Sanitize logs to remove sensitive data<br>
+                    • Use proper error messages (don't leak info)<br>
+                    • Implement data classification and handling policies
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Severity Mapping Guide</h2>
+        <p>General guidelines for mapping CWEs to omnibus-review severity levels:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>CWE Category</th>
+                    <th>Typical Severity</th>
+                    <th>Conditions for Upgrade</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Remote Code Execution</td>
+                    <td><span class="badge badge-critical">CRITICAL</span></td>
+                    <td>Always critical</td>
+                </tr>
+                <tr>
+                    <td>SQL/Command Injection</td>
+                    <td><span class="badge badge-critical">CRITICAL</span></td>
+                    <td>Production code; HIGH if dev-only</td>
+                </tr>
+                <tr>
+                    <td>Hard-coded Credentials</td>
+                    <td><span class="badge badge-critical">CRITICAL</span></td>
+                    <td>Production keys; HIGH if test keys</td>
+                </tr>
+                <tr>
+                    <td>Authentication Bypass</td>
+                    <td><span class="badge badge-critical">CRITICAL</span></td>
+                    <td>Admin/financial; HIGH for user features</td>
+                </tr>
+                <tr>
+                    <td>XSS</td>
+                    <td><span class="badge badge-high">HIGH</span></td>
+                    <td>Stored XSS = CRITICAL; Reflected = HIGH</td>
+                </tr>
+                <tr>
+                    <td>Missing Authorization</td>
+                    <td><span class="badge badge-high">HIGH</span></td>
+                    <td>Financial/admin = CRITICAL; user features = HIGH</td>
+                </tr>
+                <tr>
+                    <td>Insecure Deserialization</td>
+                    <td><span class="badge badge-high">HIGH</span></td>
+                    <td>Untrusted input = CRITICAL; internal = HIGH</td>
+                </tr>
+                <tr>
+                    <td>Weak Crypto</td>
+                    <td><span class="badge badge-high">HIGH</span></td>
+                    <td>Passwords/sensitive = HIGH; non-security = MEDIUM</td>
+                </tr>
+                <tr>
+                    <td>CSRF</td>
+                    <td><span class="badge badge-medium">MEDIUM</span></td>
+                    <td>Financial operations = HIGH; other = MEDIUM</td>
+                </tr>
+                <tr>
+                    <td>Information Disclosure</td>
+                    <td><span class="badge badge-medium">MEDIUM</span></td>
+                    <td>PII/passwords = HIGH; technical info = MEDIUM</td>
+                </tr>
+                <tr>
+                    <td>Missing Input Validation</td>
+                    <td><span class="badge badge-medium">MEDIUM</span></td>
+                    <td>Security-critical path = HIGH; other = MEDIUM</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>Additional Common CWEs</h2>
+
+        <h3>Correctness Issues</h3>
+        <ul>
+            <li><strong>CWE-476:</strong> NULL Pointer Dereference (HIGH)</li>
+            <li><strong>CWE-119:</strong> Buffer Overflow (CRITICAL in C/C++)</li>
+            <li><strong>CWE-190:</strong> Integer Overflow (HIGH)</li>
+            <li><strong>CWE-369:</strong> Divide By Zero (MEDIUM)</li>
+            <li><strong>CWE-617:</strong> Reachable Assertion (LOW)</li>
+        </ul>
+
+        <h3>Concurrency Issues</h3>
+        <ul>
+            <li><strong>CWE-362:</strong> Race Condition (HIGH)</li>
+            <li><strong>CWE-667:</strong> Improper Locking (HIGH)</li>
+            <li><strong>CWE-833:</strong> Deadlock (HIGH)</li>
+            <li><strong>CWE-404:</strong> Resource Leak (MEDIUM)</li>
+        </ul>
+
+        <h3>Configuration Issues</h3>
+        <ul>
+            <li><strong>CWE-16:</strong> Configuration (varies by impact)</li>
+            <li><strong>CWE-732:</strong> Incorrect Permission Assignment (HIGH)</li>
+            <li><strong>CWE-522:</strong> Insufficiently Protected Credentials (CRITICAL)</li>
+            <li><strong>CWE-311:</strong> Missing Encryption of Sensitive Data (HIGH)</li>
+        </ul>
+
+        <h3>Code Quality Issues</h3>
+        <ul>
+            <li><strong>CWE-561:</strong> Dead Code (LOW)</li>
+            <li><strong>CWE-563:</strong> Unused Variable (LOW)</li>
+            <li><strong>CWE-1104:</strong> Use of Unmaintained Third Party Components (varies)</li>
+            <li><strong>CWE-1095:</strong> Loop Condition Value Update within the Loop (MEDIUM)</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>External Resources</h2>
+        <ul>
+            <li><a href="https://cwe.mitre.org/" target="_blank" class="owasp-link">CWE Official Site</a></li>
+            <li><a href="https://owasp.org/www-project-top-ten/" target="_blank" class="owasp-link">OWASP Top 10</a></li>
+            <li><a href="https://cwe.mitre.org/top25/" target="_blank" class="owasp-link">CWE Top 25</a></li>
+            <li><a href="https://nvd.nist.gov/" target="_blank" class="owasp-link">National Vulnerability Database</a></li>
+            <li><a href="https://cheatsheetseries.owasp.org/" target="_blank" class="owasp-link">OWASP Cheat Sheets</a></li>
+        </ul>
+    </section>
+
+    <footer style="margin-top: 40px; padding: 20px; text-align: center; color: #6c757d; border-top: 1px solid var(--border);">
+        <p><a href="../README.html" style="color: var(--low);">Back to README</a></p>
+    </footer>
+</body>
+</html>

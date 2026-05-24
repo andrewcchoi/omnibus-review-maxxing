@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Checklist - Omnibus Review</title>
+    <style>
+        :root {
+            --critical: #dc3545;
+            --high: #fd7e14;
+            --medium: #ffc107;
+            --low: #0d6efd;
+            --success: #198754;
+            --background: #f8f9fa;
+            --text: #212529;
+            --border: #dee2e6;
+            --code-bg: #f5f5f5;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--background);
+            margin: 0;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            color: var(--text);
+        }
+
+        h2 {
+            color: var(--text);
+            margin-top: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        h3 {
+            color: var(--text);
+            margin-top: 20px;
+        }
+
+        section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .checklist li {
+            padding: 12px 15px;
+            margin: 8px 0;
+            background: var(--background);
+            border-radius: 5px;
+            border-left: 4px solid var(--low);
+            position: relative;
+            padding-left: 45px;
+        }
+
+        .checklist li:before {
+            content: "☐";
+            position: absolute;
+            left: 15px;
+            font-size: 1.3em;
+            color: var(--low);
+        }
+
+        .checklist-critical li {
+            border-left-color: var(--critical);
+        }
+
+        .checklist-critical li:before {
+            color: var(--critical);
+        }
+
+        .checklist-high li {
+            border-left-color: var(--high);
+        }
+
+        .checklist-high li:before {
+            color: var(--high);
+        }
+
+        .checklist-medium li {
+            border-left-color: var(--medium);
+        }
+
+        .checklist-medium li:before {
+            color: var(--medium);
+        }
+
+        code {
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .command-box {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+
+        .tip {
+            background: #d1ecf1;
+            border-left: 4px solid var(--low);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid var(--medium);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .nav-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--low);
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+
+        .phase-card {
+            background: var(--background);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid var(--success);
+        }
+
+        .phase-card h3 {
+            margin-top: 0;
+            color: var(--success);
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            section, header {
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+            .checklist li:before {
+                content: "☐";
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Review Checklist</h1>
+        <p>Comprehensive preparation and post-review actions for Omnibus Review</p>
+    </header>
+
+    <a href="../README.html" class="nav-link">← Back to README</a>
+
+    <section>
+        <h2>Pre-Review Preparation</h2>
+        <p>Complete these steps before running <code>/omnibus-review</code> to ensure the best results.</p>
+
+        <h3>Essential Prerequisites (Required)</h3>
+        <ul class="checklist checklist-critical">
+            <li>Stage changes you want reviewed with <code>git add</code></li>
+            <li>Ensure working directory has no uncommitted changes that would interfere</li>
+            <li>Verify you're on the correct branch</li>
+            <li>Confirm tests are passing locally</li>
+        </ul>
+
+        <div class="command-box">
+# Check current status
+git status
+
+# Stage specific files
+git add path/to/modified/file.py
+
+# Or stage all changes
+git add .
+
+# Verify what's staged
+git diff --cached --stat
+        </div>
+
+        <h3>Code Quality Checks (Recommended)</h3>
+        <ul class="checklist checklist-high">
+            <li>Run linters (ruff, eslint, etc.) and fix auto-fixable issues</li>
+            <li>Run formatters (black, prettier, etc.) for consistent style</li>
+            <li>Run type checkers (mypy, TypeScript compiler) and fix errors</li>
+            <li>Ensure all tests pass with <code>pytest</code> or equivalent</li>
+            <li>Remove debug code, console.logs, and commented-out code</li>
+        </ul>
+
+        <div class="tip">
+            <strong>Pro Tip:</strong> Run local quality checks first to avoid having omnibus-review
+            flag issues that automated tools could have caught instantly. This saves review time
+            and keeps findings focused on deeper issues.
+        </div>
+
+        <h3>Documentation Updates (Recommended)</h3>
+        <ul class="checklist checklist-medium">
+            <li>Update CLAUDE.md if you're introducing new patterns or conventions</li>
+            <li>Update README.md if you're changing setup instructions or architecture</li>
+            <li>Add/update docstrings for new public functions and classes</li>
+            <li>Update API documentation if you changed endpoint signatures</li>
+            <li>Add comments for complex logic or non-obvious decisions</li>
+        </ul>
+
+        <h3>Test Coverage (Recommended)</h3>
+        <ul class="checklist checklist-medium">
+            <li>Write tests for new features before review</li>
+            <li>Add edge case tests for critical paths</li>
+            <li>Update existing tests if you changed behavior</li>
+            <li>Verify test names are descriptive and follow project conventions</li>
+            <li>Check that test coverage hasn't decreased</li>
+        </ul>
+
+        <div class="command-box">
+# Python test coverage
+pytest --cov=src tests/
+coverage html  # Generate HTML report
+
+# JavaScript/TypeScript test coverage
+npm test -- --coverage
+        </div>
+    </section>
+
+    <section>
+        <h2>Running the Review</h2>
+
+        <div class="phase-card">
+            <h3>Phase 1: Initial Review (Report Only)</h3>
+            <p>Start with a report-only review to understand the scope of issues:</p>
+            <div class="command-box">/omnibus-review</div>
+            <p><strong>Duration:</strong> 3-5 minutes typically</p>
+            <p><strong>Output:</strong> Full report of all findings without making changes</p>
+        </div>
+
+        <div class="phase-card">
+            <h3>Phase 2: Quick Triage (High-Priority Only)</h3>
+            <p>If time is limited, focus on critical and high severity issues first:</p>
+            <div class="command-box">/omnibus-review --min-severity high</div>
+            <p><strong>Duration:</strong> 2-3 minutes typically</p>
+            <p><strong>Output:</strong> Only CRITICAL and HIGH findings</p>
+        </div>
+
+        <div class="phase-card">
+            <h3>Phase 3: Automated Fixes (Optional)</h3>
+            <p>After reviewing findings, apply automated fixes:</p>
+            <div class="command-box">/omnibus-review --fix</div>
+            <p><strong>Duration:</strong> 8-20 minutes typically (includes re-testing)</p>
+            <p><strong>Output:</strong> Fixed code with staged changes</p>
+        </div>
+
+        <div class="warning">
+            <strong>Important:</strong> Always review the automated fixes before committing.
+            While the fix cycle includes testing, it's still important to understand what changed.
+        </div>
+    </section>
+
+    <section>
+        <h2>Post-Review Actions</h2>
+
+        <h3>Review Findings (Critical Priority)</h3>
+        <ul class="checklist checklist-critical">
+            <li>Read all CRITICAL findings and fix immediately</li>
+            <li>DO NOT MERGE if any CRITICAL issues remain</li>
+            <li>Verify security vulnerabilities are fully resolved</li>
+            <li>Rotate any exposed credentials (API keys, passwords)</li>
+        </ul>
+
+        <h3>Address High-Priority Issues</h3>
+        <ul class="checklist checklist-high">
+            <li>Fix all HIGH severity issues before merging to main/production</li>
+            <li>Review automated fixes if <code>--fix</code> was used</li>
+            <li>Test fixed code manually in addition to automated tests</li>
+            <li>Consider if HIGH issues indicate broader architectural problems</li>
+        </ul>
+
+        <h3>Triage Medium/Low Issues</h3>
+        <ul class="checklist checklist-medium">
+            <li>Create tickets for MEDIUM issues in project tracker</li>
+            <li>Assign to appropriate sprint or backlog</li>
+            <li>Group related issues for batch fixing</li>
+            <li>Consider addressing LOW issues during refactoring</li>
+        </ul>
+
+        <h3>Review Staged Changes</h3>
+        <ul class="checklist checklist-high">
+            <li>Review all staged changes with <code>git diff --cached</code></li>
+            <li>Verify automated fixes are correct and don't break functionality</li>
+            <li>Check that no unintended changes were made</li>
+            <li>Run full test suite one more time</li>
+        </ul>
+
+        <div class="command-box">
+# Review what will be committed
+git diff --cached
+
+# Review specific file
+git diff --cached path/to/file.py
+
+# Interactive staging review
+git add -p
+        </div>
+
+        <h3>Commit Changes</h3>
+        <ul class="checklist checklist-medium">
+            <li>Write clear commit message describing fixes</li>
+            <li>Reference issue numbers if applicable</li>
+            <li>Consider splitting unrelated fixes into separate commits</li>
+            <li>Include link to omnibus-review report if saved</li>
+        </ul>
+
+        <div class="command-box">
+# Good commit message examples
+git commit -m "fix: Address critical security findings from omnibus-review
+
+- Fix SQL injection in payment processing (C-1)
+- Remove hardcoded API keys, use env vars (C-2)
+- Resolve N+1 query in subscription loader (H-1)
+
+See: .omnibus-review/report_2026-05-23_143215.json"
+
+# Or use interactive commit for fine control
+git commit -v
+        </div>
+    </section>
+
+    <section>
+        <h2>Common Issue Patterns</h2>
+        <p>Recurring patterns to watch for and address proactively:</p>
+
+        <h3>Security Patterns</h3>
+        <ul class="checklist">
+            <li>SQL injection from string interpolation → Use parameterized queries</li>
+            <li>XSS from unescaped user input → Use template auto-escaping or explicit escape</li>
+            <li>Hardcoded credentials → Move to environment variables</li>
+            <li>Missing authentication checks → Add auth middleware</li>
+            <li>Insecure random numbers → Use secrets module for crypto</li>
+            <li>Path traversal risks → Validate and sanitize file paths</li>
+        </ul>
+
+        <h3>Correctness Patterns</h3>
+        <ul class="checklist">
+            <li>Off-by-one errors in loops → Use correct range boundaries</li>
+            <li>Null/undefined dereferencing → Add null checks or optional chaining</li>
+            <li>Race conditions → Add proper locking or use atomic operations</li>
+            <li>Unhandled exceptions → Add try/catch with appropriate recovery</li>
+            <li>Type coercion bugs → Use strict equality and explicit conversions</li>
+            <li>Integer overflow → Validate numeric bounds</li>
+        </ul>
+
+        <h3>Performance Patterns</h3>
+        <ul class="checklist">
+            <li>N+1 queries → Use eager loading or joins</li>
+            <li>Missing indexes → Add indexes on frequently queried columns</li>
+            <li>Inefficient loops → Consider list comprehensions or bulk operations</li>
+            <li>Memory leaks → Ensure cleanup in finally blocks or context managers</li>
+            <li>Blocking I/O in async → Use async/await consistently</li>
+            <li>No caching → Add caching for expensive computations</li>
+        </ul>
+
+        <h3>Architecture Patterns</h3>
+        <ul class="checklist">
+            <li>Circular dependencies → Extract shared logic to common module</li>
+            <li>God objects → Split into focused, single-purpose classes</li>
+            <li>Missing abstractions → Create interfaces or base classes</li>
+            <li>Tight coupling → Use dependency injection</li>
+            <li>Duplicate code → Extract to shared utilities</li>
+            <li>Inconsistent patterns → Follow established project conventions</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>When to Re-Run Review</h2>
+        <p>Consider running omnibus-review again in these scenarios:</p>
+
+        <ul class="checklist">
+            <li>After fixing CRITICAL/HIGH issues to verify resolution</li>
+            <li>After significant refactoring to catch regressions</li>
+            <li>Before final merge to main/production branch</li>
+            <li>After merging upstream changes that conflict with your fixes</li>
+            <li>If you added substantial new code during fix phase</li>
+            <li>When confidence threshold flags seem too aggressive (adjust with <code>--confidence</code>)</li>
+        </ul>
+
+        <div class="tip">
+            <strong>Verification Run:</strong> After fixing issues, run with high confidence to verify:
+            <div class="command-box">/omnibus-review --min-severity high --confidence 0.85</div>
+            This ensures no new critical issues were introduced and original issues are truly resolved.
+        </div>
+    </section>
+
+    <section>
+        <h2>Integration with CI/CD</h2>
+        <p>Best practices for incorporating omnibus-review into automated pipelines:</p>
+
+        <h3>Pre-Merge Gate</h3>
+        <ul class="checklist">
+            <li>Run omnibus-review on pull requests automatically</li>
+            <li>Block merge if CRITICAL issues found</li>
+            <li>Require approval for HIGH issues</li>
+            <li>Generate report as PR comment</li>
+        </ul>
+
+        <h3>Scheduled Audits</h3>
+        <ul class="checklist">
+            <li>Run weekly full-codebase review on main branch</li>
+            <li>Track issue trends over time</li>
+            <li>Generate security reports for compliance</li>
+            <li>Alert on new CRITICAL findings</li>
+        </ul>
+
+        <div class="tip">
+            <strong>CI Configuration Example:</strong> Parse JSON output for automated decision-making:
+            <div class="command-box">
+# In CI script
+/omnibus-review --min-severity high --output report.json
+critical_count=$(jq '.summary.by_severity.critical' report.json)
+if [ "$critical_count" -gt 0 ]; then
+  echo "CRITICAL issues found - blocking merge"
+  exit 1
+fi
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Troubleshooting Checklist</h2>
+
+        <h3>Review Won't Start</h3>
+        <ul class="checklist">
+            <li>Verify git repository is initialized</li>
+            <li>Check that changes are staged with <code>git add</code></li>
+            <li>Ensure you're not in detached HEAD state</li>
+            <li>Verify Claude Code plugin is enabled</li>
+        </ul>
+
+        <h3>Too Many False Positives</h3>
+        <ul class="checklist">
+            <li>Increase confidence threshold: <code>--confidence 0.85</code></li>
+            <li>Update CLAUDE.md with project-specific patterns</li>
+            <li>Filter to higher severities: <code>--min-severity medium</code></li>
+            <li>Check if agents have sufficient context (large refactor may confuse)</li>
+        </ul>
+
+        <h3>Review Taking Too Long</h3>
+        <ul class="checklist">
+            <li>Limit to specific files: <code>--files "src/critical/**"</code></li>
+            <li>Run quick triage first: <code>--min-severity high</code></li>
+            <li>Split large changes into smaller reviewable chunks</li>
+            <li>Check for timeout issues with very large files</li>
+        </ul>
+
+        <h3>Fixes Not Working</h3>
+        <ul class="checklist">
+            <li>Ensure tests pass before running <code>--fix</code></li>
+            <li>Check for missing environment variables</li>
+            <li>Review rollback messages for specific failure reasons</li>
+            <li>Some issues require manual judgment (expected behavior)</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Quick Reference Commands</h2>
+
+        <h3>Common Workflows</h3>
+        <div class="command-box">
+# Standard comprehensive review
+/omnibus-review
+
+# Quick pre-merge check (critical + high only)
+/omnibus-review --min-severity high
+
+# Full review with auto-fix
+/omnibus-review --fix
+
+# Focus on security changes only
+/omnibus-review --files "src/auth/**/*.py" --min-severity high
+
+# High-confidence findings only (reduce false positives)
+/omnibus-review --confidence 0.9
+
+# Review specific area with fix
+/omnibus-review --files "src/payment/**" --fix --max-iterations 3
+        </div>
+
+        <h3>Git Commands for Review Workflow</h3>
+        <div class="command-box">
+# Prepare for review
+git add -p                    # Interactively stage changes
+git diff --cached            # Review what's staged
+
+# After review
+git diff --cached            # Review automated fixes
+git commit -v                # Commit with verbose diff
+
+# If you need to unstage
+git reset HEAD path/to/file  # Unstage specific file
+git reset                    # Unstage all
+
+# Create review checkpoint
+git stash                    # Save work-in-progress
+/omnibus-review              # Run review on clean state
+git stash pop                # Restore work
+        </div>
+    </section>
+
+    <footer style="margin-top: 40px; padding: 20px; text-align: center; color: #6c757d; border-top: 1px solid var(--border);">
+        <p><a href="../README.html" style="color: var(--low);">Back to README</a></p>
+    </footer>
+</body>
+</html>

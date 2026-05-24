@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"="width=device-width, initial-scale=1.0">
+    <title>Agent Overview - Omnibus Review</title>
+    <style>
+        :root {
+            --critical: #dc3545;
+            --high: #fd7e14;
+            --medium: #ffc107;
+            --low: #0d6efd;
+            --success: #198754;
+            --background: #f8f9fa;
+            --text: #212529;
+            --border: #dee2e6;
+            --code-bg: #f5f5f5;
+            --agent-security: #e74c3c;
+            --agent-architecture: #3498db;
+            --agent-correctness: #2ecc71;
+            --agent-performance: #f39c12;
+            --agent-test: #9b59b6;
+            --agent-style: #1abc9c;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--background);
+            margin: 0;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            color: var(--text);
+        }
+
+        h2 {
+            color: var(--text);
+            margin-top: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .agent-card {
+            background: white;
+            border: 2px solid;
+            border-radius: 8px;
+            padding: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .agent-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .agent-security { border-color: var(--agent-security); }
+        .agent-architecture { border-color: var(--agent-architecture); }
+        .agent-correctness { border-color: var(--agent-correctness); }
+        .agent-performance { border-color: var(--agent-performance); }
+        .agent-test { border-color: var(--agent-test); }
+        .agent-style { border-color: var(--agent-style); }
+
+        .agent-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .agent-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 15px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .icon-security { background: var(--agent-security); }
+        .icon-architecture { background: var(--agent-architecture); }
+        .icon-correctness { background: var(--agent-correctness); }
+        .icon-performance { background: var(--agent-performance); }
+        .icon-test { background: var(--agent-test); }
+        .icon-style { background: var(--agent-style); }
+
+        .agent-card h3 {
+            margin: 0;
+            font-size: 1.4em;
+        }
+
+        .agent-card ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .agent-card li {
+            margin: 5px 0;
+        }
+
+        .example-box {
+            background: var(--code-bg);
+            padding: 12px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 0.9em;
+            border-left: 3px solid;
+        }
+
+        .security-example { border-color: var(--agent-security); }
+        .architecture-example { border-color: var(--agent-architecture); }
+        .correctness-example { border-color: var(--agent-correctness); }
+        .performance-example { border-color: var(--agent-performance); }
+        .test-example { border-color: var(--agent-test); }
+        .style-example { border-color: var(--agent-style); }
+
+        .model-badge {
+            display: inline-block;
+            background: #6f42c1;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .nav-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--low);
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--background);
+            font-weight: 600;
+        }
+
+        code {
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .collaboration {
+            background: var(--background);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            section, header {
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+            .agent-card {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Agent Overview</h1>
+        <p>Detailed responsibilities and focus areas for each specialist agent</p>
+    </header>
+
+    <a href="../README.html" class="nav-link">← Back to README</a>
+
+    <section>
+        <h2>The Six Specialist Agents</h2>
+        <p>
+            Omnibus Review employs six specialized AI agents, each powered by Claude Opus 4.5 with
+            ultrathink extended thinking. Each agent operates independently, focusing on their domain
+            expertise to provide comprehensive coverage without overlap or groupthink.
+        </p>
+
+        <div class="agent-grid">
+            <div class="agent-card agent-security">
+                <div class="agent-header">
+                    <div class="agent-icon icon-security">🛡️</div>
+                    <div>
+                        <h3>Security Analyst</h3>
+                        <div class="model-badge">Claude Opus 4.5 + ultrathink</div>
+                    </div>
+                </div>
+                <p><strong>Mission:</strong> Identify vulnerabilities, attack vectors, and security misconfigurations</p>
+                <p><strong>Focus Areas:</strong></p>
+                <ul>
+                    <li>Injection vulnerabilities (SQL, command, LDAP)</li>
+                    <li>Authentication and authorization flaws</li>
+                    <li>Cryptographic misuse</li>
+                    <li>Sensitive data exposure</li>
+                    <li>Security misconfiguration</li>
+                    <li>Cross-site scripting (XSS)</li>
+                    <li>Insecure deserialization</li>
+                    <li>Known vulnerable dependencies</li>
+                </ul>
+                <p><strong>Expertise:</strong> OWASP Top 10, CWE database, CVE patterns</p>
+            </div>
+
+            <div class="agent-card agent-architecture">
+                <div class="agent-header">
+                    <div class="agent-icon icon-architecture">🏗️</div>
+                    <div>
+                        <h3>Architecture Reviewer</h3>
+                        <div class="model-badge">Claude Opus 4.5 + ultrathink</div>
+                    </div>
+                </div>
+                <p><strong>Mission:</strong> Assess design quality, maintainability, and scalability</p>
+                <p><strong>Focus Areas:</strong></p>
+                <ul>
+                    <li>Separation of concerns</li>
+                    <li>Design pattern adherence</li>
+                    <li>Coupling and cohesion</li>
+                    <li>Abstraction levels</li>
+                    <li>Modularity and reusability</li>
+                    <li>Circular dependencies</li>
+                    <li>Scalability concerns</li>
+                    <li>Technical debt accumulation</li>
+                </ul>
+                <p><strong>Expertise:</strong> SOLID principles, design patterns, architectural styles</p>
+            </div>
+
+            <div class="agent-card agent-correctness">
+                <div class="agent-header">
+                    <div class="agent-icon icon-correctness">✓</div>
+                    <div>
+                        <h3>Correctness Verifier</h3>
+                        <div class="model-badge">Claude Opus 4.5 + ultrathink</div>
+                    </div>
+                </div>
+                <p><strong>Mission:</strong> Verify logic correctness and identify functional bugs</p>
+                <p><strong>Focus Areas:</strong></p>
+                <ul>
+                    <li>Logic errors and edge cases</li>
+                    <li>Null/undefined handling</li>
+                    <li>Type safety violations</li>
+                    <li>Off-by-one errors</li>
+                    <li>Race conditions</li>
+                    <li>State management issues</li>
+                    <li>Error handling completeness</li>
+                    <li>Business logic correctness</li>
+                </ul>
+                <p><strong>Expertise:</strong> Formal verification techniques, boundary analysis</p>
+            </div>
+
+            <div class="agent-card agent-performance">
+                <div class="agent-header">
+                    <div class="agent-icon icon-performance">⚡</div>
+                    <div>
+                        <h3>Performance Auditor</h3>
+                        <div class="model-badge">Claude Opus 4.5 + ultrathink</div>
+                    </div>
+                </div>
+                <p><strong>Mission:</strong> Identify performance bottlenecks and resource inefficiencies</p>
+                <p><strong>Focus Areas:</strong></p>
+                <ul>
+                    <li>N+1 query problems</li>
+                    <li>Algorithmic complexity (O(n²) → O(n log n))</li>
+                    <li>Memory leaks</li>
+                    <li>Missing database indexes</li>
+                    <li>Inefficient loops and iterations</li>
+                    <li>Resource exhaustion risks</li>
+                    <li>Caching opportunities</li>
+                    <li>Blocking operations in async code</li>
+                </ul>
+                <p><strong>Expertise:</strong> Big-O analysis, profiling patterns, database optimization</p>
+            </div>
+
+            <div class="agent-card agent-test">
+                <div class="agent-header">
+                    <div class="agent-icon icon-test">🧪</div>
+                    <div>
+                        <h3>Test Evaluator</h3>
+                        <div class="model-badge">Claude Opus 4.5 + ultrathink</div>
+                    </div>
+                </div>
+                <p><strong>Mission:</strong> Assess test coverage, quality, and maintainability</p>
+                <p><strong>Focus Areas:</strong></p>
+                <ul>
+                    <li>Test coverage gaps</li>
+                    <li>Missing edge case tests</li>
+                    <li>Flaky test patterns</li>
+                    <li>Test maintainability</li>
+                    <li>Assertion quality</li>
+                    <li>Test data management</li>
+                    <li>Integration vs unit test balance</li>
+                    <li>Mock overuse/misuse</li>
+                </ul>
+                <p><strong>Expertise:</strong> Testing pyramid, TDD principles, test patterns</p>
+            </div>
+
+            <div class="agent-card agent-style">
+                <div class="agent-header">
+                    <div class="agent-icon icon-style">✨</div>
+                    <div>
+                        <h3>Code Style Checker</h3>
+                        <div class="model-badge">Claude Opus 4.5 + ultrathink</div>
+                    </div>
+                </div>
+                <p><strong>Mission:</strong> Ensure readability, consistency, and documentation quality</p>
+                <p><strong>Focus Areas:</strong></p>
+                <ul>
+                    <li>Naming conventions</li>
+                    <li>Code formatting consistency</li>
+                    <li>Documentation completeness</li>
+                    <li>Comment quality</li>
+                    <li>Function length and complexity</li>
+                    <li>Magic numbers and constants</li>
+                    <li>Dead code and unused imports</li>
+                    <li>Readability improvements</li>
+                </ul>
+                <p><strong>Expertise:</strong> Style guides, clean code principles, documentation standards</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Example Findings by Agent</h2>
+
+        <h3>Security Analyst</h3>
+        <div class="example-box security-example">
+            <strong>Finding:</strong> SQL Injection Vulnerability<br>
+            <strong>Location:</strong> <code>src/repositories/user_repo.py:45</code><br>
+            <strong>Severity:</strong> CRITICAL<br>
+            <strong>Description:</strong> User input directly interpolated into SQL query without parameterization.
+            An attacker could inject malicious SQL to access or modify arbitrary data.<br>
+            <code>query = f"SELECT * FROM users WHERE email = '{email}'"</code><br>
+            <strong>Recommendation:</strong> Use parameterized queries: <code>query = "SELECT * FROM users WHERE email = ?"</code>
+        </div>
+
+        <div class="example-box security-example">
+            <strong>Finding:</strong> Hardcoded Credentials<br>
+            <strong>Location:</strong> <code>src/config.py:12</code><br>
+            <strong>Severity:</strong> CRITICAL<br>
+            <strong>Description:</strong> API key hardcoded in source code, will be committed to version control.<br>
+            <code>API_KEY = "sk_live_abc123xyz789"</code><br>
+            <strong>Recommendation:</strong> Use environment variables: <code>API_KEY = os.getenv("API_KEY")</code>
+        </div>
+
+        <h3>Architecture Reviewer</h3>
+        <div class="example-box architecture-example">
+            <strong>Finding:</strong> Circular Dependency Detected<br>
+            <strong>Location:</strong> <code>src/services/user_service.py</code> ↔ <code>src/services/auth_service.py</code><br>
+            <strong>Severity:</strong> HIGH<br>
+            <strong>Description:</strong> UserService imports AuthService and AuthService imports UserService,
+            creating a circular dependency that makes testing difficult and increases coupling.<br>
+            <strong>Recommendation:</strong> Extract shared logic into a third module or use dependency injection.
+        </div>
+
+        <div class="example-box architecture-example">
+            <strong>Finding:</strong> God Object Anti-Pattern<br>
+            <strong>Location:</strong> <code>src/controllers/api_controller.py</code><br>
+            <strong>Severity:</strong> MEDIUM<br>
+            <strong>Description:</strong> Single controller class handles 47 different endpoints across multiple
+            domains (users, posts, comments, auth). Violates single responsibility principle.<br>
+            <strong>Recommendation:</strong> Split into domain-specific controllers (UserController, PostController, etc.)
+        </div>
+
+        <h3>Correctness Verifier</h3>
+        <div class="example-box correctness-example">
+            <strong>Finding:</strong> Off-by-One Error in Pagination<br>
+            <strong>Location:</strong> <code>src/services/post_service.py:78</code><br>
+            <strong>Severity:</strong> HIGH<br>
+            <strong>Description:</strong> Pagination calculation excludes the last item on each page.<br>
+            <code>end_index = start_index + page_size</code> should be <code>start_index + page_size</code><br>
+            <strong>Recommendation:</strong> Change to <code>end_index = min(start_index + page_size, total_items)</code>
+        </div>
+
+        <div class="example-box correctness-example">
+            <strong>Finding:</strong> Unhandled Promise Rejection<br>
+            <strong>Location:</strong> <code>src/api/client.ts:34</code><br>
+            <strong>Severity:</strong> MEDIUM<br>
+            <strong>Description:</strong> Async function call without error handling. If the API request fails,
+            the error will be unhandled and may crash the application.<br>
+            <code>const result = await fetchData(url);</code><br>
+            <strong>Recommendation:</strong> Add try/catch or .catch() handler
+        </div>
+
+        <h3>Performance Auditor</h3>
+        <div class="example-box performance-example">
+            <strong>Finding:</strong> N+1 Query Problem<br>
+            <strong>Location:</strong> <code>src/controllers/post_controller.py:56</code><br>
+            <strong>Severity:</strong> HIGH<br>
+            <strong>Description:</strong> Loading posts in a loop, triggering one query per post. For 100 posts,
+            this creates 101 database queries (1 for posts + 100 for authors).<br>
+            <code>for post in posts: print(post.author.name)</code><br>
+            <strong>Recommendation:</strong> Use eager loading: <code>posts = session.query(Post).options(joinedload(Post.author)).all()</code>
+        </div>
+
+        <div class="example-box performance-example">
+            <strong>Finding:</strong> Missing Database Index<br>
+            <strong>Location:</strong> <code>alembic/versions/abc123_create_logs.py</code><br>
+            <strong>Severity:</strong> MEDIUM<br>
+            <strong>Description:</strong> Frequent queries by user_id but no index on logs.user_id column.
+            Will cause slow queries as table grows.<br>
+            <strong>Recommendation:</strong> Add index: <code>CREATE INDEX idx_logs_user_id ON logs(user_id)</code>
+        </div>
+
+        <h3>Test Evaluator</h3>
+        <div class="example-box test-example">
+            <strong>Finding:</strong> Missing Edge Case Tests<br>
+            <strong>Location:</strong> <code>tests/test_user_service.py</code><br>
+            <strong>Severity:</strong> MEDIUM<br>
+            <strong>Description:</strong> Tests only cover happy path for user registration. Missing tests for:
+            duplicate email, invalid email format, missing required fields, SQL injection attempts.<br>
+            <strong>Recommendation:</strong> Add parametrized tests covering error cases
+        </div>
+
+        <div class="example-box test-example">
+            <strong>Finding:</strong> Flaky Test - Time Dependency<br>
+            <strong>Location:</strong> <code>tests/test_auth.py:89</code><br>
+            <strong>Severity:</strong> MEDIUM<br>
+            <strong>Description:</strong> Test compares timestamps with exact equality, will fail randomly due to
+            execution timing variations.<br>
+            <code>assert token.created_at == datetime.now()</code><br>
+            <strong>Recommendation:</strong> Use time range: <code>assert abs((token.created_at - datetime.now()).seconds) < 2</code>
+        </div>
+
+        <h3>Code Style Checker</h3>
+        <div class="example-box style-example">
+            <strong>Finding:</strong> Unclear Variable Naming<br>
+            <strong>Location:</strong> <code>src/utils/helpers.py:23</code><br>
+            <strong>Severity:</strong> LOW<br>
+            <strong>Description:</strong> Variable name 'x' is too generic, doesn't convey purpose.<br>
+            <code>x = calculate_total(items)</code><br>
+            <strong>Recommendation:</strong> Rename to <code>total_price</code> or <code>order_total</code>
+        </div>
+
+        <div class="example-box style-example">
+            <strong>Finding:</strong> Missing Function Documentation<br>
+            <strong>Location:</strong> <code>src/services/payment_service.py:67</code><br>
+            <strong>Severity:</strong> LOW<br>
+            <strong>Description:</strong> Complex public function lacks docstring explaining parameters,
+            return value, and potential exceptions.<br>
+            <strong>Recommendation:</strong> Add docstring with Args, Returns, and Raises sections
+        </div>
+    </section>
+
+    <section>
+        <h2>Agent Collaboration Patterns</h2>
+
+        <div class="collaboration">
+            <h3>Independent but Complementary</h3>
+            <p>
+                Agents work in isolation during Phase 2 but their findings often overlap in beneficial ways:
+            </p>
+            <ul>
+                <li><strong>Security + Correctness:</strong> SQL injection (security) + unvalidated input (correctness) = high confidence finding</li>
+                <li><strong>Performance + Architecture:</strong> N+1 queries (performance) + tight coupling (architecture) = systemic issue</li>
+                <li><strong>Test + Correctness:</strong> Missing tests (test) + edge case bugs (correctness) = coverage gap</li>
+                <li><strong>Style + Architecture:</strong> God object (architecture) + poor naming (style) = maintainability problem</li>
+            </ul>
+        </div>
+
+        <h3>Agreement Signals Quality</h3>
+        <p>When multiple agents independently identify the same issue, it's a strong signal:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Agent Overlap</th>
+                    <th>Confidence Boost</th>
+                    <th>Interpretation</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>2 agents agree</td>
+                    <td>+0.1</td>
+                    <td>Independent verification, likely real issue</td>
+                </tr>
+                <tr>
+                    <td>3+ agents agree</td>
+                    <td>+0.15</td>
+                    <td>Strong consensus, definitely needs attention</td>
+                </tr>
+                <tr>
+                    <td>Security + Correctness</td>
+                    <td>+0.15 + severity upgrade</td>
+                    <td>Exploitable bug, highest priority</td>
+                </tr>
+                <tr>
+                    <td>No overlap</td>
+                    <td>0</td>
+                    <td>Unique perspective, evaluate on confidence alone</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Domain Boundaries</h3>
+        <p>Each agent respects domain boundaries to avoid redundant analysis:</p>
+        <ul>
+            <li><strong>Security:</strong> Focuses on exploitability, not implementation quality</li>
+            <li><strong>Architecture:</strong> Design patterns, not specific bugs</li>
+            <li><strong>Correctness:</strong> Logic errors, not performance</li>
+            <li><strong>Performance:</strong> Resource efficiency, not correctness</li>
+            <li><strong>Test:</strong> Test quality only, not production code style</li>
+            <li><strong>Style:</strong> Readability and consistency, not functionality</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Why Claude Opus 4.5 + Ultrathink?</h2>
+
+        <h3>Model Selection Rationale</h3>
+        <p>
+            All six agents use Claude Opus 4.5 with ultrathink extended thinking for maximum quality:
+        </p>
+        <ul>
+            <li><strong>Deep Reasoning:</strong> Security and correctness analysis require multi-step logical reasoning</li>
+            <li><strong>Context Mastery:</strong> Understanding large codebases with complex dependencies</li>
+            <li><strong>False Positive Reduction:</strong> Nuanced judgment to distinguish real issues from patterns that look suspicious but are intentional</li>
+            <li><strong>Cross-Language Expertise:</strong> Strong performance across Python, JavaScript, TypeScript, Go, Rust, etc.</li>
+        </ul>
+
+        <h3>Ultrathink Benefits</h3>
+        <p>Extended thinking mode allows agents to:</p>
+        <ul>
+            <li>Consider multiple hypotheses before reporting</li>
+            <li>Trace execution paths through complex control flow</li>
+            <li>Evaluate security implications of seemingly benign code</li>
+            <li>Recognize subtle architectural violations</li>
+            <li>Perform deeper static analysis than standard models</li>
+        </ul>
+
+        <h3>Trade-offs</h3>
+        <ul>
+            <li><strong>Speed:</strong> 2-3x slower than Sonnet, but thoroughness justifies the time</li>
+            <li><strong>Cost:</strong> Higher per-review cost, but fewer false positives means less wasted engineering time</li>
+            <li><strong>When to Use:</strong> Pre-merge reviews, security audits, major refactors - not for every commit</li>
+        </ul>
+    </section>
+
+    <footer style="margin-top: 40px; padding: 20px; text-align: center; color: #6c757d; border-top: 1px solid var(--border);">
+        <p><a href="../README.html" style="color: var(--low);">Back to README</a></p>
+    </footer>
+</body>
+</html>

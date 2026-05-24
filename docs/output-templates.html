@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Output Templates - Omnibus Review</title>
+    <style>
+        :root {
+            --critical: #dc3545;
+            --high: #fd7e14;
+            --medium: #ffc107;
+            --low: #0d6efd;
+            --success: #198754;
+            --background: #f8f9fa;
+            --text: #212529;
+            --border: #dee2e6;
+            --code-bg: #f5f5f5;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--background);
+            margin: 0;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            color: var(--text);
+        }
+
+        h2 {
+            color: var(--text);
+            margin-top: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        h3 {
+            margin-top: 20px;
+        }
+
+        section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .template {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+            overflow-x: auto;
+            margin: 20px 0;
+            border: 2px solid var(--border);
+        }
+
+        .template-title {
+            background: var(--background);
+            color: var(--text);
+            padding: 10px 15px;
+            border-radius: 5px 5px 0 0;
+            font-weight: 600;
+            margin: -20px -20px 20px -20px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 8px;
+            color: white;
+        }
+
+        .badge-critical { background: var(--critical); }
+        .badge-high { background: var(--high); }
+        .badge-medium { background: var(--medium); color: var(--text); }
+        .badge-low { background: var(--low); }
+        .badge-success { background: var(--success); }
+
+        .nav-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--low);
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+
+        .description {
+            background: var(--background);
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid var(--low);
+        }
+
+        code {
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .section-divider {
+            border-top: 2px dashed var(--border);
+            margin: 30px 0;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            section, header {
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+            .template {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Output Templates</h1>
+        <p>Example output formats for Omnibus Review reports</p>
+    </header>
+
+    <a href="../README.html" class="nav-link">← Back to README</a>
+
+    <section>
+        <h2>Review Summary Report</h2>
+        <div class="description">
+            <p><strong>When:</strong> After Phase 3 aggregation completes</p>
+            <p><strong>Contains:</strong> Executive summary, issue breakdown by severity, detailed findings with recommendations</p>
+        </div>
+
+        <div class="template">
+<div class="template-title">Review Summary Report</div>
+============================================================
+OMNIBUS REVIEW SUMMARY
+============================================================
+Repository: resumate-platform
+Branch: feature/payment-integration
+Reviewed: 2026-05-23 14:32:15 UTC
+Agents: Security, Architecture, Correctness, Performance, Test, Style
+Review Duration: 3m 42s
+
+============================================================
+EXECUTIVE SUMMARY
+============================================================
+Analyzed 247 staged changes across 18 files
+
+Issues Found:
+  🔴 CRITICAL: 2
+  🟠 HIGH:     5
+  🟡 MEDIUM:   12
+  🔵 LOW:      8
+
+Agent Contributions:
+  Security Analyst:     7 findings (2 critical, 3 high)
+  Architecture Review:  4 findings (2 high, 2 medium)
+  Correctness Verify:   6 findings (1 high, 3 medium, 2 low)
+  Performance Audit:    5 findings (1 high, 3 medium, 1 low)
+  Test Evaluator:       4 findings (3 medium, 1 low)
+  Code Style:           1 finding (1 low)
+
+Top Recommendations:
+  1. Fix SQL injection in payment processing (CRITICAL)
+  2. Address hardcoded API keys (CRITICAL)
+  3. Resolve N+1 query in subscription loading (HIGH)
+  4. Add missing authorization checks (HIGH)
+
+============================================================
+CRITICAL ISSUES (2)
+============================================================
+
+[C-1] SQL Injection in Payment Query
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Severity:    CRITICAL
+Confidence:  0.95
+Category:    Security > Injection
+CWE:         CWE-89 (SQL Injection)
+Agents:      Security Analyst, Correctness Verifier
+
+Location:
+  File:  backend/src/services/payment_service.py
+  Lines: 156-158
+
+Code:
+  156 │ def process_payment(amount: float, user_email: str):
+  157 │     query = f"INSERT INTO payments (amount, user_email)
+  158 │              VALUES ({amount}, '{user_email}')"
+
+Description:
+  User-controlled input (user_email) is directly interpolated into
+  SQL query without parameterization. An attacker could inject
+  malicious SQL to access or modify arbitrary database records.
+
+  Example exploit: user_email = "'); DROP TABLE payments; --"
+
+Impact:
+  - Complete database compromise possible
+  - Data theft or destruction
+  - Unauthorized payment manipulation
+
+Recommendation:
+  Use parameterized queries with SQLAlchemy:
+
+  stmt = insert(Payment).values(
+      amount=amount,
+      user_email=user_email
+  )
+  await session.execute(stmt)
+
+Related Issues: None
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[C-2] Hardcoded Stripe API Key
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Severity:    CRITICAL
+Confidence:  1.0
+Category:    Security > Credential Exposure
+CWE:         CWE-798 (Use of Hard-coded Credentials)
+Agents:      Security Analyst
+
+Location:
+  File:  backend/src/config.py
+  Lines: 23
+
+Code:
+  23 │ STRIPE_SECRET_KEY = "sk_live_51MxJK2L..."
+
+Description:
+  Production Stripe secret key is hardcoded in source code and
+  will be committed to version control. This exposes the key to
+  anyone with repository access and historical commit access.
+
+Impact:
+  - Unauthorized payment processing
+  - Financial fraud
+  - Customer data breach
+  - Stripe account suspension
+
+Recommendation:
+  1. Immediately rotate the exposed key in Stripe dashboard
+  2. Use environment variable:
+     STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
+  3. Add .env to .gitignore
+  4. Document required env vars in README
+
+Related Issues: None
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+============================================================
+HIGH SEVERITY ISSUES (5)
+============================================================
+
+[H-1] N+1 Query in Subscription Loader
+[H-2] Missing Authorization on Admin Endpoint
+[H-3] Race Condition in Payment Status Update
+[H-4] Circular Dependency: PaymentService ↔ UserService
+[H-5] Unhandled Stripe Webhook Signature Validation
+
+(Full details available in detailed report)
+
+============================================================
+MEDIUM SEVERITY ISSUES (12)
+============================================================
+[M-1]  Missing transaction isolation
+[M-2]  Incomplete error handling in webhook handler
+[M-3]  Test coverage gap: payment retry logic
+[M-4]  Inefficient payment history query
+[M-5]  God object: PaymentService (45 methods)
+...
+
+============================================================
+LOW SEVERITY ISSUES (8)
+============================================================
+[L-1]  Unclear variable naming: 'x' in calculate_fee()
+[L-2]  Missing docstring: process_refund()
+...
+
+============================================================
+NEXT STEPS
+============================================================
+1. IMMEDIATE: Fix critical issues C-1 and C-2 before ANY merge
+2. BEFORE MERGE: Address all HIGH severity issues (H-1 through H-5)
+3. PLAN: Create tickets for MEDIUM issues in next sprint
+4. OPTIONAL: Address LOW issues during refactoring
+
+To auto-fix critical and high issues, run:
+  /omnibus-review --fix
+
+For detailed report with code snippets:
+  /omnibus-review --output detailed_report.json
+
+============================================================
+        </div>
+    </section>
+
+    <section>
+        <h2>Fix Cycle Progress Format</h2>
+        <div class="description">
+            <p><strong>When:</strong> During Phase 4 Ralph Loop fix cycle</p>
+            <p><strong>Contains:</strong> Real-time progress updates, fix status, test results</p>
+        </div>
+
+        <div class="template">
+<div class="template-title">Fix Cycle Progress</div>
+============================================================
+RALPH LOOP FIX CYCLE - ITERATION 1/5
+============================================================
+
+Priority Queue: 7 issues (2 CRITICAL, 5 HIGH)
+
+[1/7] Fixing C-1: SQL Injection in Payment Query
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Status: Analyzing issue...
+Target: backend/src/services/payment_service.py:156-158
+
+Applying fix:
+  - Converting to parameterized query
+  - Using SQLAlchemy insert() with values()
+  - Removing string interpolation
+
+Changes staged:
+  M backend/src/services/payment_service.py (3 lines changed)
+
+Running test suite...
+  ✓ tests/test_payment_service.py::test_process_payment
+  ✓ tests/test_payment_service.py::test_payment_validation
+  ✓ tests/test_payment_service.py::test_sql_injection_prevention
+  ✓ All tests passing (47 passed, 0 failed)
+
+Verifying fix...
+  ✓ SQL injection vulnerability resolved
+  ✓ No new issues introduced
+
+Result: ✅ FIXED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[2/7] Fixing C-2: Hardcoded Stripe API Key
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Status: Analyzing issue...
+Target: backend/src/config.py:23
+
+Applying fix:
+  - Replacing hardcoded key with environment variable
+  - Adding validation for missing env var
+  - Updating .env.example
+
+Changes staged:
+  M backend/src/config.py (2 lines changed)
+  M backend/.env.example (1 line added)
+
+Running test suite...
+  ✓ tests/test_config.py::test_stripe_key_from_env
+  ✗ tests/test_payment_service.py::test_create_payment_intent
+    Error: STRIPE_SECRET_KEY environment variable not set
+
+Rolling back changes...
+  ✓ Rollback complete
+
+Result: ⚠️  MANUAL INTERVENTION REQUIRED
+Reason: Environment variable needs to be set before tests can run
+Action: Please set STRIPE_SECRET_KEY in .env file, then re-run
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[3/7] Fixing H-1: N+1 Query in Subscription Loader
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Status: Analyzing issue...
+...
+
+============================================================
+FIX CYCLE SUMMARY - ITERATION 1
+============================================================
+Attempted: 7 issues
+Fixed:     5 issues
+Failed:    2 issues (require manual intervention)
+Remaining: 0 critical, 2 high
+
+Next Steps:
+1. Set STRIPE_SECRET_KEY environment variable
+2. Re-run fix cycle for remaining issues: /omnibus-review --fix
+
+Changes are staged and ready to commit.
+============================================================
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <section>
+        <h2>Completion Message Format</h2>
+        <div class="description">
+            <p><strong>When:</strong> After successful completion of review (with or without fixes)</p>
+            <p><strong>Contains:</strong> Summary of work done, files changed, next actions</p>
+        </div>
+
+        <div class="template">
+<div class="template-title">Completion Message - Report Only</div>
+============================================================
+✅ OMNIBUS REVIEW COMPLETE
+============================================================
+
+Duration: 3m 42s
+Files Analyzed: 18
+Issues Found: 27 (2 critical, 5 high, 12 medium, 8 low)
+
+Report saved to: .omnibus-review/report_2026-05-23_143215.json
+
+CRITICAL ATTENTION REQUIRED:
+  🔴 C-1: SQL Injection in Payment Query
+  🔴 C-2: Hardcoded Stripe API Key
+
+Do NOT merge until critical issues are resolved.
+
+Recommended Actions:
+  1. Review detailed findings above
+  2. Fix critical issues immediately
+  3. Run: /omnibus-review --fix (to auto-fix CRITICAL + HIGH)
+  4. Address remaining issues before merge
+
+Questions? See: .claude/plugins/omnibus-review/README.html
+============================================================
+        </div>
+
+        <div class="template" style="margin-top: 30px;">
+<div class="template-title">Completion Message - With Auto-Fix</div>
+============================================================
+✅ OMNIBUS REVIEW + FIX CYCLE COMPLETE
+============================================================
+
+Duration: 17m 28s
+  - Review Phase: 3m 42s
+  - Fix Cycle: 13m 46s (3 iterations)
+
+Files Analyzed: 18
+Issues Found: 27 (2 critical, 5 high, 12 medium, 8 low)
+Issues Fixed: 23 (2 critical, 5 high, 11 medium, 5 low)
+Remaining: 4 (1 medium, 3 low)
+
+Changes Staged:
+  M backend/src/services/payment_service.py
+  M backend/src/config.py
+  M backend/src/repositories/subscription_repo.py
+  M backend/src/controllers/admin_controller.py
+  M backend/.env.example
+  M tests/test_payment_service.py
+
+All tests passing: ✅ (152 passed, 0 failed)
+
+Remaining Issues (Not Auto-Fixed):
+  🟡 M-12: Refactor PaymentService god object (requires design decision)
+  🔵 L-6:  Add docstring to calculate_fee()
+  🔵 L-7:  Rename variable 'x' to 'total_fees'
+  🔵 L-8:  Remove unused import in webhook_handler.py
+
+Next Steps:
+  1. Review staged changes: git diff --cached
+  2. Commit fixes: git commit -m "fix: Address omnibus-review findings"
+  3. Create tickets for remaining medium issues
+  4. Consider addressing low issues during refactoring
+
+Report saved to: .omnibus-review/report_2026-05-23_143215.json
+Ready to merge once you've reviewed the automated fixes! 🚀
+============================================================
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <section>
+        <h2>JSON Output Format</h2>
+        <div class="description">
+            <p><strong>When:</strong> Saved automatically after each review</p>
+            <p><strong>Location:</strong> <code>.omnibus-review/report_[timestamp].json</code></p>
+            <p><strong>Purpose:</strong> Machine-readable format for CI/CD integration, custom tooling</p>
+        </div>
+
+        <div class="template">
+<div class="template-title">report_2026-05-23_143215.json</div>
+{
+  "metadata": {
+    "timestamp": "2026-05-23T14:32:15Z",
+    "repository": "resumate-platform",
+    "branch": "feature/payment-integration",
+    "commit": "a3f7b9c2d1e",
+    "review_duration_seconds": 222,
+    "omnibus_version": "1.0.0"
+  },
+  "summary": {
+    "files_analyzed": 18,
+    "total_issues": 27,
+    "by_severity": {
+      "critical": 2,
+      "high": 5,
+      "medium": 12,
+      "low": 8
+    },
+    "by_agent": {
+      "security": 7,
+      "architecture": 4,
+      "correctness": 6,
+      "performance": 5,
+      "test": 4,
+      "style": 1
+    }
+  },
+  "issues": [
+    {
+      "id": "C-1",
+      "severity": "critical",
+      "category": "security.injection",
+      "cwe": "CWE-89",
+      "title": "SQL Injection in Payment Query",
+      "description": "User-controlled input directly interpolated into SQL query without parameterization",
+      "location": {
+        "file": "backend/src/services/payment_service.py",
+        "line_start": 156,
+        "line_end": 158,
+        "function": "process_payment"
+      },
+      "code_snippet": "query = f\"INSERT INTO payments (amount, user_email) VALUES ({amount}, '{user_email}')\"",
+      "agents": ["security", "correctness"],
+      "confidence": 0.95,
+      "impact": "critical",
+      "exploitability": "high",
+      "recommendation": "Use parameterized queries with SQLAlchemy",
+      "references": [
+        "https://owasp.org/www-community/attacks/SQL_Injection",
+        "https://cwe.mitre.org/data/definitions/89.html"
+      ],
+      "fixed": true,
+      "fix_iteration": 1
+    },
+    {
+      "id": "C-2",
+      "severity": "critical",
+      "category": "security.credential_exposure",
+      "cwe": "CWE-798",
+      "title": "Hardcoded Stripe API Key",
+      "description": "Production secret key hardcoded in source code",
+      "location": {
+        "file": "backend/src/config.py",
+        "line_start": 23,
+        "line_end": 23,
+        "function": null
+      },
+      "code_snippet": "STRIPE_SECRET_KEY = \"sk_live_51MxJK2L...\"",
+      "agents": ["security"],
+      "confidence": 1.0,
+      "impact": "critical",
+      "exploitability": "high",
+      "recommendation": "Use environment variable and rotate exposed key",
+      "references": [
+        "https://cwe.mitre.org/data/definitions/798.html"
+      ],
+      "fixed": false,
+      "fix_failure_reason": "Requires manual environment configuration"
+    }
+  ],
+  "fix_cycle": {
+    "enabled": true,
+    "iterations": 3,
+    "max_iterations": 5,
+    "issues_fixed": 23,
+    "issues_failed": 2,
+    "test_results": {
+      "total": 152,
+      "passed": 152,
+      "failed": 0,
+      "duration_seconds": 47
+    },
+    "files_modified": [
+      "backend/src/services/payment_service.py",
+      "backend/src/config.py",
+      "backend/src/repositories/subscription_repo.py",
+      "backend/src/controllers/admin_controller.py",
+      "backend/.env.example",
+      "tests/test_payment_service.py"
+    ]
+  }
+}
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <section>
+        <h2>Error Output Format</h2>
+        <div class="description">
+            <p><strong>When:</strong> Review encounters fatal error</p>
+            <p><strong>Contains:</strong> Error details, troubleshooting suggestions</p>
+        </div>
+
+        <div class="template">
+<div class="template-title">Error Output Example</div>
+============================================================
+❌ OMNIBUS REVIEW FAILED
+============================================================
+
+Error Type: ValidationError
+Phase: Pre-Review (Phase 1)
+
+Error Message:
+  No staged changes found in repository
+
+Details:
+  Omnibus Review requires staged changes to analyze.
+  Use 'git add' to stage files for review.
+
+Current Status:
+  Tracked files modified:   0
+  Untracked files:          0
+  Staged changes:           0
+
+Troubleshooting:
+  1. Stage changes you want reviewed:
+     git add path/to/file.py
+
+  2. Check current status:
+     git status
+
+  3. If changes exist but aren't staged:
+     git add .  (stage all changes)
+     git add -p (interactively stage chunks)
+
+  4. To review specific files:
+     git add file1.py file2.py
+     /omnibus-review
+
+Documentation: .claude/plugins/omnibus-review/README.html
+============================================================
+        </div>
+
+        <div class="template" style="margin-top: 30px;">
+<div class="template-title">Agent Timeout Error</div>
+============================================================
+⚠️  OMNIBUS REVIEW PARTIALLY COMPLETED
+============================================================
+
+Completed Agents: 4/6
+  ✅ Security Analyst
+  ✅ Architecture Reviewer
+  ✅ Correctness Verifier
+  ✅ Performance Auditor
+  ⏱️  Test Evaluator (timeout after 5m)
+  ⏱️  Code Style Checker (timeout after 5m)
+
+Findings from completed agents: 19 issues
+
+Note: Some findings may be incomplete due to agent timeouts.
+This usually happens with very large changesets (>500 files).
+
+Recommendations:
+  1. Review findings from completed agents (may include critical issues)
+  2. Consider splitting changes into smaller reviews
+  3. Use --files flag to focus on specific areas:
+     /omnibus-review --files "src/critical/**/*.py"
+  4. Increase timeout if needed (contact admin)
+
+Partial report saved to: .omnibus-review/partial_report_[timestamp].json
+============================================================
+        </div>
+    </section>
+
+    <footer style="margin-top: 40px; padding: 20px; text-align: center; color: #6c757d; border-top: 1px solid var(--border);">
+        <p><a href="../README.html" style="color: var(--low);">Back to README</a></p>
+    </footer>
+</body>
+</html>

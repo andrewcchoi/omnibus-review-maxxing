@@ -1,0 +1,9 @@
+{
+  "name": "omnibus-review",
+  "version": "1.0.0",
+  "description": "Comprehensive code review combining correctness, security, compliance, testing, error handling, and quality analysis with iterative fixing via Ralph Loop",
+  "author": {
+    "name": "resumate-platform"
+  },
+  "keywords": ["code-review", "security", "testing", "quality", "ralph-loop"]
+}

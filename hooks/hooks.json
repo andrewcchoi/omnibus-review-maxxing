@@ -1,0 +1,16 @@
+{
+  "description": "Omnibus Review plugin stop hook for iterative review and fix cycles",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/scripts/stop-hook.sh\"",
+            "timeout": 15000
+          }
+        ]
+      }
+    ]
+  }
+}

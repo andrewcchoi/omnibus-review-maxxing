@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workflow Diagram - Omnibus Review</title>
+    <style>
+        :root {
+            --critical: #dc3545;
+            --high: #fd7e14;
+            --medium: #ffc107;
+            --low: #0d6efd;
+            --success: #198754;
+            --background: #f8f9fa;
+            --text: #212529;
+            --border: #dee2e6;
+            --code-bg: #f5f5f5;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--background);
+            margin: 0;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            color: var(--text);
+        }
+
+        h2 {
+            color: var(--text);
+            margin-top: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .diagram {
+            background: white;
+            padding: 20px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        .phase {
+            background: var(--background);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid var(--low);
+        }
+
+        .phase h3 {
+            margin-top: 0;
+            color: var(--low);
+        }
+
+        .decision {
+            background: #fff3cd;
+            border-left: 4px solid var(--medium);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .success-path {
+            background: #d1e7dd;
+            border-left: 4px solid var(--success);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .error-path {
+            background: #f8d7da;
+            border-left: 4px solid var(--critical);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+
+        .nav-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--low);
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+
+        ul {
+            margin: 10px 0;
+        }
+
+        li {
+            margin: 5px 0;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            section, header {
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Workflow Diagram</h1>
+        <p>Visual process flow for Omnibus Review multi-agent system</p>
+    </header>
+
+    <a href="../README.html" class="nav-link">← Back to README</a>
+
+    <section>
+        <h2>Complete Workflow Overview</h2>
+        <div class="diagram">
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              USER INVOKES                                    │
+│                         /omnibus-review [OPTIONS]                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃  PHASE 1: PRE-REVIEW VALIDATION & CONTEXT GATHERING                        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+                                      │
+                    ┌─────────────────┼─────────────────┐
+                    ▼                 ▼                 ▼
+            ┌─────────────┐   ┌─────────────┐   ┌─────────────┐
+            │ Git Status  │   │  Read Docs  │   │  Analyze    │
+            │  Validation │   │ CLAUDE.md   │   │  Project    │
+            │             │   │  README.md  │   │  Structure  │
+            └─────────────┘   └─────────────┘   └─────────────┘
+                    │                 │                 │
+                    └─────────────────┼─────────────────┘
+                                      ▼
+                            ┌───────────────────┐
+                            │  Staged changes?  │
+                            └───────────────────┘
+                                   ╱   ╲
+                              NO  ╱     ╲  YES
+                                 ╱       ╲
+                                ▼         ▼
+                        ┌──────────┐   ┌──────────────────┐
+                        │  ERROR   │   │  Build Context   │
+                        │   EXIT   │   │  for Agents      │
+                        └──────────┘   └──────────────────┘
+                                               │
+                                               ▼
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃  PHASE 2: PARALLEL SPECIALIST REVIEW (6 INDEPENDENT AGENTS)                ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+                                      │
+        ┌─────────────┬───────────────┼───────────────┬─────────────┬──────────┐
+        ▼             ▼               ▼               ▼             ▼          ▼
+┌──────────────┐ ┌────────────┐ ┌──────────────┐ ┌────────────┐ ┌──────┐ ┌──────┐
+│   Security   │ │Architecture│ │ Correctness  │ │Performance │ │ Test │ │Style │
+│   Analyst    │ │  Reviewer  │ │  Verifier    │ │  Auditor   │ │ Eval │ │Check │
+│              │ │            │ │              │ │            │ │      │ │      │
+│ Model: Opus  │ │Model: Opus │ │ Model: Opus  │ │Model: Opus │ │Opus  │ │Opus  │
+│ + ultrathink │ │+ ultrathink│ │ + ultrathink │ │+ ultrathink│ │+ultra│ │+ultra│
+└──────────────┘ └────────────┘ └──────────────┘ └────────────┘ └──────┘ └──────┘
+        │             │               │               │             │          │
+        │  Each agent reads:          │               │             │          │
+        │  • Staged diff              │               │             │          │
+        │  • Related files            │               │             │          │
+        │  • Project context          │               │             │          │
+        │  • Documentation            │               │             │          │
+        │             │               │               │             │          │
+        └─────────────┴───────────────┴───────────────┴─────────────┴──────────┘
+                                      │
+                        Reports findings to coordinator
+                                      ▼
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃  PHASE 3: AGGREGATION & PRIORITIZATION                                     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+                                      │
+                    ┌─────────────────┼─────────────────┐
+                    ▼                 ▼                 ▼
+        ┌────────────────────┐ ┌──────────────┐ ┌─────────────────┐
+        │   Deduplication    │ │   Severity   │ │    Grouping     │
+        │  Same file+line    │ │  Assignment  │ │ Related Issues  │
+        │   Same category    │ │  CRIT→LOW    │ │  Root Causes    │
+        └────────────────────┘ └──────────────┘ └─────────────────┘
+                    │                 │                 │
+                    └─────────────────┼─────────────────┘
+                                      ▼
+                        ┌─────────────────────────┐
+                        │ Filter by Confidence    │
+                        │  Threshold (>0.7)       │
+                        └─────────────────────────┘
+                                      │
+                                      ▼
+                        ┌─────────────────────────┐
+                        │  Generate Consolidated  │
+                        │    Review Report        │
+                        └─────────────────────────┘
+                                      │
+                                      ▼
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃  DECISION POINT: Should we auto-fix?                                       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+                                      │
+                  ┌───────────────────┼───────────────────┐
+                  │                   │                   │
+      ┌───────────────────┐   ┌──────────────┐   ┌──────────────┐
+      │  --fix flag set?  │   │ CRITICAL or  │   │   No fixes   │
+      │       YES         │   │ HIGH found?  │   │    needed    │
+      └───────────────────┘   └──────────────┘   └──────────────┘
+                  │                   │                   │
+                  └───────────────────┼───────────────────┘
+                                      ▼
+                            ┌───────────────────┐
+                            │  Enter Phase 4?   │
+                            └───────────────────┘
+                                   ╱   ╲
+                              YES ╱     ╲ NO
+                                 ╱       ╲
+                                ▼         ▼
+┏━━━━━━━━━━━━━━━━━━━━━━┓         ┌──────────────────┐
+┃  PHASE 4: FIX CYCLE  ┃         │  Present Report  │
+┗━━━━━━━━━━━━━━━━━━━━━━┛         │   EXIT SUCCESS   │
+                                 └──────────────────┘
+        </div>
+    </section>
+
+    <section>
+        <h2>Phase 1: Pre-Review Validation</h2>
+
+        <div class="phase">
+            <h3>Step 1: Git Status Check</h3>
+            <ul>
+                <li>Verify repository is a valid git repo</li>
+                <li>Check for staged changes with <code>git diff --cached</code></li>
+                <li>Identify modified files and line ranges</li>
+                <li>Exit with error if no staged changes found</li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <h3>Step 2: Documentation Gathering</h3>
+            <ul>
+                <li>Read CLAUDE.md for project patterns and conventions</li>
+                <li>Read README.md for architecture overview</li>
+                <li>Parse package.json/pyproject.toml for dependencies</li>
+                <li>Identify technology stack (languages, frameworks)</li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <h3>Step 3: Project Structure Analysis</h3>
+            <ul>
+                <li>Map directory structure and module organization</li>
+                <li>Identify test directories and patterns</li>
+                <li>Locate configuration files</li>
+                <li>Build dependency graph for changed files</li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <h3>Step 4: Context Package Creation</h3>
+            <ul>
+                <li>Compile relevant context for each agent</li>
+                <li>Include staged diff with full context</li>
+                <li>Add related unchanged files for reference</li>
+                <li>Package project conventions and patterns</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h2>Phase 2: Parallel Specialist Review</h2>
+
+        <div class="diagram">
+┌─────────────────────────────────────────────────────────────────────┐
+│                    PARALLEL AGENT DISPATCH                           │
+│                                                                      │
+│  Master Thread:                                                      │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │  for agent in [security, architecture, correctness,          │  │
+│  │                 performance, test, style]:                    │  │
+│  │      launch_agent(agent, context, config)                    │  │
+│  │                                                               │  │
+│  │  wait_for_all_agents()                                       │  │
+│  │  collect_results()                                           │  │
+│  └──────────────────────────────────────────────────────────────┘  │
+│                                                                      │
+│  Agent Execution (isolated):                                        │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │  1. Receive context package                                  │  │
+│  │  2. Read staged diff + related files                         │  │
+│  │  3. Apply domain expertise with ultrathink                   │  │
+│  │  4. Generate findings with confidence scores                 │  │
+│  │  5. Return structured JSON report                            │  │
+│  └──────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────┘
+        </div>
+
+        <div class="phase">
+            <h3>Agent Independence</h3>
+            <p>Each agent operates in isolation with:</p>
+            <ul>
+                <li>No knowledge of other agents' findings</li>
+                <li>Independent reasoning and judgment</li>
+                <li>Domain-specific focus areas</li>
+                <li>Same context package but different analytical lens</li>
+            </ul>
+            <p><strong>Why?</strong> Prevents groupthink, maximizes coverage, allows specialization</p>
+        </div>
+
+        <div class="phase">
+            <h3>Execution Time</h3>
+            <ul>
+                <li><strong>Sequential estimate:</strong> 6 agents × 2 min avg = 12 minutes</li>
+                <li><strong>Parallel actual:</strong> ~2-3 minutes (longest agent determines total)</li>
+                <li><strong>Trade-off:</strong> Higher API cost for 6× faster results</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h2>Phase 3: Aggregation & Prioritization</h2>
+
+        <div class="diagram">
+INPUT: 6 Agent Reports (JSON)
+  ↓
+┌─────────────────────────────────────────────────────────────┐
+│ Step 1: Deduplication                                       │
+│ ────────────────────────────────────────────────────────    │
+│ • Hash each finding: (file, line, category, description)   │
+│ • Group identical findings                                  │
+│ • Retain highest confidence version                         │
+│ • Track which agents agreed                                 │
+│                                                             │
+│ Example:                                                    │
+│   Security Agent: "SQL injection at users.py:45"           │
+│   Correctness Agent: "Unvalidated input at users.py:45"    │
+│   → Merged as one issue with both perspectives             │
+└─────────────────────────────────────────────────────────────┘
+  ↓
+┌─────────────────────────────────────────────────────────────┐
+│ Step 2: Severity Assignment                                 │
+│ ────────────────────────────────────────────────────────    │
+│ • Apply severity matrix (see severity-guide.html)          │
+│ • Consider impact + exploitability                         │
+│ • Upgrade severity if multiple agents agree                │
+│ • Factor in project context (prod vs dev)                  │
+└─────────────────────────────────────────────────────────────┘
+  ↓
+┌─────────────────────────────────────────────────────────────┐
+│ Step 3: Grouping Related Issues                            │
+│ ────────────────────────────────────────────────────────    │
+│ • Cluster by root cause                                    │
+│ • Link dependent issues (fix A enables fix B)              │
+│ • Create issue families (same pattern repeated)            │
+│ • Suggest batch fixes where applicable                     │
+└─────────────────────────────────────────────────────────────┘
+  ↓
+┌─────────────────────────────────────────────────────────────┐
+│ Step 4: Confidence Filtering                               │
+│ ────────────────────────────────────────────────────────    │
+│ • Remove findings below threshold (default 0.7)            │
+│ • Retain if multiple agents agree (even if lower conf)     │
+│ • Flag uncertain findings for human review                 │
+└─────────────────────────────────────────────────────────────┘
+  ↓
+OUTPUT: Consolidated Review Report
+        </div>
+    </section>
+
+    <section>
+        <h2>Phase 4: Ralph Loop Fix Cycle</h2>
+
+        <div class="decision">
+            <h3>Entry Conditions</h3>
+            <p>Phase 4 is triggered if ANY of these conditions are true:</p>
+            <ul>
+                <li>User specified <code>--fix</code> flag</li>
+                <li>CRITICAL severity issues detected</li>
+                <li>HIGH severity issues detected</li>
+            </ul>
+        </div>
+
+        <div class="diagram">
+┌─────────────────────────────────────────────────────────────────────┐
+│                      RALPH LOOP FIX CYCLE                            │
+└─────────────────────────────────────────────────────────────────────┘
+                                │
+                                ▼
+                    ┌────────────────────────┐
+                    │ Initialize Fix Queue   │
+                    │  CRITICAL first        │
+                    │  Then HIGH             │
+                    └────────────────────────┘
+                                │
+                                ▼
+                    ┌────────────────────────┐
+                    │  Iteration Counter = 0 │
+                    └────────────────────────┘
+                                │
+                ┌───────────────┴───────────────┐
+                ▼                               ▼
+    ┌──────────────────────┐        ┌──────────────────────┐
+    │ More issues to fix?  │        │ Max iterations       │
+    │       YES            │        │   reached?           │
+    └──────────────────────┘        └──────────────────────┘
+                │                               │
+                ▼                               │ YES
+    ┌──────────────────────┐                   │
+    │ Pop next issue       │                   │
+    │ from priority queue  │                   │
+    └──────────────────────┘                   │
+                │                               │
+                ▼                               │
+    ┌──────────────────────┐                   │
+    │  Apply automated fix │                   │
+    │  • Edit relevant     │                   │
+    │    files             │                   │
+    │  • Run formatters    │                   │
+    │  • Stage changes     │                   │
+    └──────────────────────┘                   │
+                │                               │
+                ▼                               │
+    ┌──────────────────────┐                   │
+    │  Run test suite      │                   │
+    └──────────────────────┘                   │
+                │                               │
+           ╱────┴────╲                          │
+      PASS ╱          ╲ FAIL                    │
+          ╱            ╲                        │
+         ▼              ▼                       │
+┌──────────────┐  ┌────────────────┐           │
+│ Mark fixed   │  │ Rollback fix   │           │
+│ Remove from  │  │ Mark as failed │           │
+│ queue        │  │ Continue       │           │
+└──────────────┘  └────────────────┘           │
+         │              │                       │
+         └──────────────┘                       │
+                │                               │
+                ▼                               │
+    ┌──────────────────────┐                   │
+    │ Increment iteration  │                   │
+    └──────────────────────┘                   │
+                │                               │
+                └───────────────────────────────┘
+                                │
+                                ▼
+                    ┌────────────────────────┐
+                    │   Re-run Full Review   │
+                    │   Verify fixes worked  │
+                    └────────────────────────┘
+                                │
+                                ▼
+                    ┌────────────────────────┐
+                    │  Generate Fix Summary  │
+                    │  • Issues resolved     │
+                    │  • Issues failed       │
+                    │  • Iterations used     │
+                    └────────────────────────┘
+        </div>
+
+        <div class="success-path">
+            <h3>Success Path</h3>
+            <ul>
+                <li>All CRITICAL/HIGH issues resolved</li>
+                <li>All tests passing</li>
+                <li>Changes staged and ready to commit</li>
+                <li>Summary report with fixes applied</li>
+            </ul>
+        </div>
+
+        <div class="error-path">
+            <h3>Failure Scenarios</h3>
+            <ul>
+                <li><strong>Max iterations:</strong> Some issues remain unfixed after limit reached</li>
+                <li><strong>Test failures:</strong> Fix caused regression, rolled back</li>
+                <li><strong>Manual intervention needed:</strong> Issue requires human judgment</li>
+                <li><strong>Conflicting fixes:</strong> Fixing A breaks B</li>
+            </ul>
+            <p><strong>Result:</strong> Report remaining issues for manual resolution</p>
+        </div>
+
+        <div class="phase">
+            <h3>Progress Tracking</h3>
+            <p>During fix cycle, user sees live updates:</p>
+            <ul>
+                <li>Iteration X of Y</li>
+                <li>Currently fixing: [issue description]</li>
+                <li>Running tests...</li>
+                <li>Resolved: X/Y issues (Z remaining)</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <h2>Timing Estimates</h2>
+
+        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+            <thead>
+                <tr style="background: var(--background);">
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid var(--border);">Phase</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid var(--border);">Estimated Time</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid var(--border);">Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--border);">Phase 1: Pre-Review</td>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--border);">15-30 seconds</td>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--border);">Reading local files, fast</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--border);">Phase 2: Agent Review</td>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--border);">2-4 minutes</td>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--border);">Parallel, ultrathink adds time</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--border);">Phase 3: Aggregation</td>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--border);">10-20 seconds</td>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--border);">Local processing</td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--border);">Phase 4: Fix Cycle</td>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--border);">5-15 minutes</td>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--border);">Varies by issue count, test time</td>
+                </tr>
+                <tr style="background: var(--background); font-weight: bold;">
+                    <td style="padding: 12px; border-bottom: 1px solid var(--border);">Total (without fix)</td>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--border);">3-5 minutes</td>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--border);">Report-only mode</td>
+                </tr>
+                <tr style="background: var(--background); font-weight: bold;">
+                    <td style="padding: 12px; border-bottom: 1px solid var(--border);">Total (with fix)</td>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--border);">8-20 minutes</td>
+                    <td style="padding: 12px; border-bottom: 1px solid var(--border);">Includes automated fixes</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <footer style="margin-top: 40px; padding: 20px; text-align: center; color: #6c757d; border-top: 1px solid var(--border);">
+        <p><a href="../README.html" style="color: var(--low);">Back to README</a></p>
+    </footer>
+</body>
+</html>
