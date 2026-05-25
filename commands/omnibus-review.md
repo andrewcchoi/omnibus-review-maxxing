@@ -664,6 +664,106 @@ The following error scenarios require specific handling:
    - Fall back to raw JSON detection (look for object/array boundaries)
    - If both fail, treat as "Agent fails to return valid JSON" (retry once)
 
+## Phase 5: Write Handoff File (Context Isolation)
+
+After completing the review (whether report or fix mode), update the handoff file for context isolation between iterations. This ensures each iteration starts with minimal, controlled context.
+
+### Check if Loop is Active
+
+```bash
+HANDOFF_FILE=".claude/omnibus-review-handoff.local.html"
+STATE_FILE=".claude/omnibus-review-loop.local.md"
+
+# Only write handoff if loop is active
+if [ ! -f "$STATE_FILE" ]; then
+  # No active loop - skip handoff file update
+  echo "No active loop - skipping handoff update"
+else
+  # Loop is active - update handoff file
+  echo "Updating handoff file for next iteration..."
+fi
+```
+
+### Determine Status
+
+Based on findings, determine the iteration status:
+- If no CRITICAL or HIGH issues remain: `status: "COMPLETE"`
+- If max iterations reached (check from state file): `status: "MAX_ITERATIONS_REACHED"`
+- Otherwise: `status: "IN_PROGRESS"`
+
+### Extract Summary Metrics
+
+From the aggregated findings, extract:
+- `critical_count`: Number of CRITICAL findings
+- `high_count`: Number of HIGH findings
+- `medium_count`: Number of MEDIUM findings
+- `low_count`: Number of LOW findings
+- `files_fixed`: Files that had issues resolved this iteration (compare to previous if available)
+- `still_needs_work`: Files with remaining CRITICAL or HIGH issues
+
+### Update Handoff File
+
+Use the Read tool to get current handoff file, then Edit tool to update:
+
+1. **Update YAML block**: Replace the `<script id="handoff-data">` content with new values:
+   ```yaml
+   iteration: ${CURRENT_ITERATION}
+   max_iterations: ${MAX_ITERATIONS}
+   session_id: "${SESSION_ID}"
+   status: "${STATUS}"
+   completion_promise: "QUANTUM_EIGENSTATE_CRYSTALLIZED_OMEGA"
+   started_at: "${STARTED_AT}"
+   last_review_summary:
+     critical_count: ${CRITICAL_COUNT}
+     high_count: ${HIGH_COUNT}
+     medium_count: ${MEDIUM_COUNT}
+     low_count: ${LOW_COUNT}
+     files_fixed: ${FILES_FIXED_JSON_ARRAY}
+     still_needs_work: ${FILES_NEEDING_WORK_JSON_ARRAY}
+   review_scope:
+     files: ${ORIGINAL_FILES_JSON_ARRAY}
+     mode: "fix"
+   context: "${BRIEF_CONTEXT_SENTENCE}"
+   ```
+
+2. **Update Mermaid diagram**: Add the current iteration to the flowchart:
+   ```mermaid
+   flowchart LR
+     I1[Iteration 1<br/>5 CRIT, 8 HIGH] --> I2[Iteration 2<br/>2 CRIT, 4 HIGH]
+     I2 --> I3[Iteration 3<br/>0 CRIT, 2 HIGH]
+     style I3 fill:#fef3c7
+   ```
+   - Use `fill:#d1fae5` (green) for COMPLETE status
+   - Use `fill:#fef3c7` (amber) for IN_PROGRESS
+   - Use `fill:#fee2e2` (red) for CRITICAL issues present
+
+3. **Update iteration HTML section**: Move current iteration to history, add new current:
+   ```html
+   <section class="iteration current" id="iter-${N}">
+     <h2>Iteration ${N} <span class="chip ${STATUS_CLASS}">${STATUS}</span></h2>
+     <div class="stats">
+       <span class="chip ${CRIT_CLASS}">${CRITICAL_COUNT} Critical</span>
+       <span class="chip ${HIGH_CLASS}">${HIGH_COUNT} High</span>
+     </div>
+     <details open>
+       <summary>Files Fixed This Iteration</summary>
+       <ul>${FILES_FIXED_LIST}</ul>
+     </details>
+     <details open>
+       <summary>Remaining Issues</summary>
+       <ul>${REMAINING_ISSUES_LIST}</ul>
+     </details>
+   </section>
+   ```
+
+### Context Sentence Guidelines
+
+The `context` field should be ONE sentence summarizing what happened:
+- Good: "Fixed null handling in api.ts and auth bypass in auth.ts. 2 HIGH issues remain in validation.ts."
+- Bad: [Full findings JSON or multi-paragraph explanation]
+
+This brief context is all that transfers to the next iteration - full findings are re-discovered by fresh agents.
+
 ## Implementation Notes
 
 - All file paths should be absolute paths from the repository root

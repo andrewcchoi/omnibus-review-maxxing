@@ -14,10 +14,16 @@ Check for the state file and remove it if it exists:
 
 <function_calls>
 <invoke name="Bash">
-<parameter name="command">if [ -f .claude/omnibus-review-loop.local.md ]; then
-  iteration=$(grep '^iteration:' .claude/omnibus-review-loop.local.md | awk '{print $2}')
-  rm .claude/omnibus-review-loop.local.md
+<parameter name="command">STATE_FILE=".claude/omnibus-review-loop.local.md"
+HANDOFF_FILE=".claude/omnibus-review-handoff.local.html"
+
+if [ -f "$STATE_FILE" ]; then
+  iteration=$(grep '^iteration:' "$STATE_FILE" | awk '{print $2}')
+  rm -f "$STATE_FILE" "$HANDOFF_FILE"
   echo "Cancelled omnibus review loop (was at iteration $iteration)"
+  if [ -f "$HANDOFF_FILE" ]; then
+    echo "Note: Handoff file was also removed"
+  fi
 else
   echo "No active omnibus review loop to cancel"
 fi

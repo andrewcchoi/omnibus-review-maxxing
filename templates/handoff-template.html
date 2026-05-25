@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Omnibus Review Progress</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --safe: #10b981;
+      --safe-bg: #d1fae5;
+      --safe-text: #065f46;
+      --medium: #f59e0b;
+      --medium-bg: #fef3c7;
+      --medium-text: #92400e;
+      --attention: #ef4444;
+      --attention-bg: #fee2e2;
+      --attention-text: #991b1b;
+    }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: #f9fafb;
+      color: #111827;
+    }
+    h1 { margin-bottom: 0.5rem; }
+    .chip {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-right: 0.5rem;
+    }
+    .chip.safe { background: var(--safe-bg); color: var(--safe-text); }
+    .chip.medium { background: var(--medium-bg); color: var(--medium-text); }
+    .chip.attention { background: var(--attention-bg); color: var(--attention-text); }
+    .iteration {
+      background: white;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      margin: 1rem 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .iteration.current { border-left: 4px solid var(--medium); }
+    .iteration h2 { margin-top: 0; }
+    .stats { margin-bottom: 1rem; }
+    details { margin: 0.5rem 0; }
+    summary { cursor: pointer; font-weight: 500; }
+    ul { margin: 0.5rem 0; padding-left: 1.5rem; }
+    li { margin: 0.25rem 0; }
+    code { background: #e5e7eb; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875rem; }
+    .mermaid { background: white; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0; }
+    .iteration-history { margin-top: 2rem; }
+    .meta { color: #6b7280; font-size: 0.875rem; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       MACHINE-READABLE YAML (Claude parses this block for iteration state)
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <script id="handoff-data" type="application/yaml">
+{{YAML_PLACEHOLDER}}
+  </script>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       HUMAN-READABLE PROGRESS (Visual report with Mermaid diagrams)
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <h1>Omnibus Review Progress</h1>
+  <p class="meta">Session: {{SESSION_ID}} | Started: {{STARTED_AT}}</p>
+
+  <!-- Progress flowchart (updated each iteration) -->
+  <div class="mermaid">
+{{MERMAID_DIAGRAM}}
+  </div>
+
+  <!-- Current iteration section -->
+{{CURRENT_ITERATION_HTML}}
+
+  <!-- Previous iterations (collapsed) -->
+{{PREVIOUS_ITERATIONS_HTML}}
+
+  <script>mermaid.initialize({startOnLoad: true});</script>
+</body>
+</html>

@@ -93,15 +93,17 @@ mkdir -p .claude
 
 # Quote completion promise for YAML
 COMPLETION_PROMISE_YAML="\"$COMPLETION_PROMISE\""
+STARTED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+SESSION_ID="${CLAUDE_CODE_SESSION_ID:-unknown}"
 
 cat > .claude/omnibus-review-loop.local.md <<EOF
 ---
 active: true
 iteration: 1
-session_id: ${CLAUDE_CODE_SESSION_ID:-}
+session_id: $SESSION_ID
 max_iterations: $MAX_ITERATIONS
 completion_promise: $COMPLETION_PROMISE_YAML
-started_at: "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+started_at: "$STARTED_AT"
 ---
 
 Continue omnibus review and fix cycle.
@@ -109,6 +111,96 @@ Fix remaining CRITICAL and HIGH issues.
 Re-run review after each fix cycle.
 Output <promise>$COMPLETION_PROMISE</promise> when no CRITICAL or HIGH issues remain.
 EOF
+
+# Create handoff HTML file with initial state (direct write for reliability)
+cat > .claude/omnibus-review-handoff.local.html <<'HTMLEOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Omnibus Review Progress</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --safe: #10b981; --safe-bg: #d1fae5; --safe-text: #065f46;
+      --medium: #f59e0b; --medium-bg: #fef3c7; --medium-text: #92400e;
+      --attention: #ef4444; --attention-bg: #fee2e2; --attention-text: #991b1b;
+    }
+    body { font-family: system-ui, -apple-system, sans-serif; max-width: 900px; margin: 0 auto; padding: 2rem; background: #f9fafb; color: #111827; }
+    h1 { margin-bottom: 0.5rem; }
+    .chip { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; margin-right: 0.5rem; }
+    .chip.safe { background: var(--safe-bg); color: var(--safe-text); }
+    .chip.medium { background: var(--medium-bg); color: var(--medium-text); }
+    .chip.attention { background: var(--attention-bg); color: var(--attention-text); }
+    .iteration { background: white; border-radius: 0.5rem; padding: 1.5rem; margin: 1rem 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .iteration.current { border-left: 4px solid var(--medium); }
+    .iteration.complete { border-left: 4px solid var(--safe); }
+    .iteration h2 { margin-top: 0; }
+    .stats { margin-bottom: 1rem; }
+    details { margin: 0.5rem 0; }
+    summary { cursor: pointer; font-weight: 500; }
+    ul { margin: 0.5rem 0; padding-left: 1.5rem; }
+    li { margin: 0.25rem 0; }
+    code { background: #e5e7eb; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875rem; }
+    .mermaid { background: white; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0; }
+    .iteration-history { margin-top: 2rem; }
+    .meta { color: #6b7280; font-size: 0.875rem; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <!-- MACHINE-READABLE YAML (Claude parses this block for iteration state) -->
+  <script id="handoff-data" type="application/yaml">
+HTMLEOF
+
+# Append YAML content with variable substitution
+cat >> .claude/omnibus-review-handoff.local.html <<EOF
+iteration: 1
+max_iterations: $MAX_ITERATIONS
+session_id: "$SESSION_ID"
+status: "STARTING"
+completion_promise: $COMPLETION_PROMISE_YAML
+started_at: "$STARTED_AT"
+last_review_summary:
+  critical_count: 0
+  high_count: 0
+  medium_count: 0
+  low_count: 0
+  files_fixed: []
+  still_needs_work: []
+review_scope:
+  files: []
+  mode: "fix"
+context: "Starting omnibus review loop. No prior iterations."
+EOF
+
+# Append rest of HTML
+cat >> .claude/omnibus-review-handoff.local.html <<HTMLEOF
+  </script>
+
+  <!-- HUMAN-READABLE PROGRESS -->
+  <h1>Omnibus Review Progress</h1>
+  <p class="meta">Session: $SESSION_ID | Started: $STARTED_AT</p>
+
+  <div class="mermaid">
+flowchart LR
+    I1[Iteration 1<br/>Starting...]
+    style I1 fill:#fef3c7
+  </div>
+
+  <section class="iteration current" id="iter-1">
+    <h2>Iteration 1 <span class="chip medium">STARTING</span></h2>
+    <div class="stats">
+      <span class="chip safe">0 Critical</span>
+      <span class="chip safe">0 High</span>
+    </div>
+    <p>Initializing review cycle...</p>
+  </section>
+
+  <script>mermaid.initialize({startOnLoad: true});</script>
+</body>
+</html>
+HTMLEOF
 
 # Output setup message
 cat <<EOF

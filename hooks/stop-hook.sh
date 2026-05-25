@@ -11,6 +11,7 @@ HOOK_INPUT=$(cat)
 
 # Check if omnibus-review loop is active
 STATE_FILE=".claude/omnibus-review-loop.local.md"
+HANDOFF_FILE=".claude/omnibus-review-handoff.local.html"
 
 if [[ ! -f "$STATE_FILE" ]]; then
   # No active loop - allow exit
@@ -105,7 +106,7 @@ if [[ $JQ_EXIT -ne 0 ]]; then
   exit 0
 fi
 
-# Check for completion promise
+# Check for completion promise in transcript
 if [[ -n "$COMPLETION_PROMISE" ]] && [[ "$COMPLETION_PROMISE" != "null" ]]; then
   # Extract text from <promise> tags using Perl for multiline support
   PROMISE_TEXT=$(echo "$LAST_OUTPUT" | perl -0777 -pe 's/.*?<promise>(.*?)<\/promise>.*/$1/s; s/^\s+|\s+$//g; s/\s+/ /g' 2>/dev/null || echo "")
@@ -113,35 +114,53 @@ if [[ -n "$COMPLETION_PROMISE" ]] && [[ "$COMPLETION_PROMISE" != "null" ]]; then
   # Use = for literal string comparison (not pattern matching)
   if [[ -n "$PROMISE_TEXT" ]] && [[ "$PROMISE_TEXT" = "$COMPLETION_PROMISE" ]]; then
     echo "Omnibus review loop complete: Detected <promise>$COMPLETION_PROMISE</promise>"
-    rm "$STATE_FILE"
+    rm -f "$STATE_FILE" "$HANDOFF_FILE"
     exit 0
   fi
 fi
 
-# Not complete - continue loop with SAME PROMPT
-NEXT_ITERATION=$((ITERATION + 1))
+# Also check handoff file for COMPLETE status (set by omnibus-review command)
+if [[ -f "$HANDOFF_FILE" ]]; then
+  HANDOFF_YAML=$(sed -n '/<script id="handoff-data" type="application\/yaml">/,/<\/script>/p' "$HANDOFF_FILE" 2>/dev/null | sed '1d;$d')
+  HANDOFF_STATUS=$(echo "$HANDOFF_YAML" | grep '^status:' | sed 's/status: *//' | tr -d '"' || echo "")
 
-# Extract prompt (everything after the closing ---)
-PROMPT_TEXT=$(awk '/^---$/{i++; next} i>=2' "$STATE_FILE")
-
-if [[ -z "$PROMPT_TEXT" ]]; then
-  echo "Warning: State file corrupted - no prompt text found" >&2
-  echo "   Stopping loop. Run /omnibus-review-loop again to start fresh." >&2
-  rm "$STATE_FILE"
-  exit 0
+  if [[ "$HANDOFF_STATUS" == "COMPLETE" ]]; then
+    echo "Omnibus review loop complete: status=COMPLETE in handoff file"
+    rm -f "$STATE_FILE" "$HANDOFF_FILE"
+    exit 0
+  fi
 fi
 
-# Update iteration in frontmatter (portable across macOS and Linux)
+# Not complete - continue loop with MINIMAL PROMPT (context isolation)
+NEXT_ITERATION=$((ITERATION + 1))
+
+# Update iteration in state file frontmatter (portable across macOS and Linux)
 TEMP_FILE="${STATE_FILE}.tmp.$$"
 sed "s/^iteration: .*/iteration: $NEXT_ITERATION/" "$STATE_FILE" > "$TEMP_FILE"
 mv "$TEMP_FILE" "$STATE_FILE"
 
-# Build system message with iteration count and completion promise info
-SYSTEM_MSG="Omnibus Review iteration $NEXT_ITERATION | To stop: output <promise>$COMPLETION_PROMISE</promise> when no CRITICAL or HIGH issues remain"
+# Also update iteration in handoff file YAML if it exists
+if [[ -f "$HANDOFF_FILE" ]]; then
+  TEMP_HANDOFF="${HANDOFF_FILE}.tmp.$$"
+  sed "s/^iteration: .*/iteration: $NEXT_ITERATION/" "$HANDOFF_FILE" > "$TEMP_HANDOFF"
+  mv "$TEMP_HANDOFF" "$HANDOFF_FILE"
+fi
 
-# Output JSON to block the stop and feed prompt back
+# Build MINIMAL prompt for context isolation
+# Instead of full prompt text, reference the handoff file for state
+MINIMAL_PROMPT="Omnibus Review Iteration $NEXT_ITERATION.
+
+Read .claude/omnibus-review-handoff.local.html for context from previous iteration.
+Continue the review and fix cycle for files in review_scope.
+When no CRITICAL or HIGH issues remain, output:
+<promise>$COMPLETION_PROMISE</promise>"
+
+# Build system message with iteration count
+SYSTEM_MSG="Omnibus Review iteration $NEXT_ITERATION | Fresh context | Read handoff file first"
+
+# Output JSON to block the stop and feed MINIMAL prompt back
 jq -n \
-  --arg prompt "$PROMPT_TEXT" \
+  --arg prompt "$MINIMAL_PROMPT" \
   --arg msg "$SYSTEM_MSG" \
   '{
     "decision": "block",
