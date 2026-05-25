@@ -4,6 +4,30 @@ description: Use this skill when the user asks for "comprehensive review", "omni
 version: 1.0.0
 ---
 
+## MANDATORY: Read Reference Documents First
+
+**BEFORE orchestrating the review, you MUST use the Read tool to read these documents:**
+
+1. `docs/workflow-diagram.html` — Defines the 4-phase execution sequence.
+   You MUST NOT begin dispatch without understanding the workflow.
+
+2. `docs/severity-guide.html` — Defines severity classification rules and thresholds.
+   You MUST NOT aggregate findings without consistent severity standards.
+
+3. `docs/agent-overview.html` — Defines each specialist agent's responsibilities.
+   You MUST NOT dispatch agents without understanding their focus areas.
+
+4. `docs/output-templates.html` — Specifies JSON schema and report structure.
+   You MUST NOT format output without conforming to this specification.
+
+5. `references/checklist.html` — Pre-review preparation and post-review actions.
+   You MUST NOT skip validation steps defined in the checklist.
+
+6. `references/cwe-quick-ref.html` — Security vulnerability classifications.
+   You MUST reference correct CWE IDs for security findings.
+
+**Why this is mandatory:** These documents define the standards for severity classification, output format, and workflow execution. Inconsistent severity or malformed output will compromise the aggregated report quality. Reading these documents is not optional.
+
 # Omnibus Review Skill
 
 Orchestrates a comprehensive code review by dispatching 6 specialized review agents in parallel, aggregating their findings, and optionally entering an iterative fixing loop.
@@ -89,14 +113,6 @@ The skill produces:
 - **JSON Report**: `omnibus-review-findings.json` with structured data for programmatic access
 - **Human Report**: `omnibus-review-report.md` with severity-grouped findings, stats, and recommendations
 - **Console Summary**: Counts by agent, severity distribution, top issues
-
-## Learn More
-
-For detailed information, see the plugin documentation:
-
-- [Workflow Diagram](../../docs/workflow-diagram.html) - Visual representation of the 4-phase process
-- [Severity Guide](../../docs/severity-guide.html) - Severity definitions and examples
-- [Agent Overview](../../docs/agent-overview.html) - Detailed agent responsibilities and focus areas
 
 ## Examples
 
