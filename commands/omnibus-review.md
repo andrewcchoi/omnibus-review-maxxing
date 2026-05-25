@@ -13,7 +13,16 @@ Run a comprehensive multi-agent code review with optional iterative fixing.
 First, parse the arguments and determine what to review:
 
 ```bash
-cd /mnt/d/_wip/resumate-platform
+# Determine project root (git root or current directory)
+PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
+cd "$PROJECT_ROOT"
+
+# Validate PROJECT_ROOT
+if [ ! -d "$PROJECT_ROOT" ] || [ "$PROJECT_ROOT" = "/" ]; then
+  echo "ERROR: Could not determine valid project root."
+  echo "Run from within a project directory or git repository."
+  exit 1
+fi
 
 # Parse arguments from $ARGUMENTS
 # Note: $ARGUMENTS is injected by Claude Code's command system
@@ -70,7 +79,7 @@ NORMALIZED_FILES=()
 for file in "${FILES[@]}"; do
   # Convert relative paths to absolute paths
   if [[ "$file" != /* ]]; then
-    file="/mnt/d/_wip/resumate-platform/$file"
+    file="$PROJECT_ROOT/$file"
   fi
   NORMALIZED_FILES+=("$file")
 done
@@ -81,16 +90,74 @@ echo "Files to review:"
 printf '%s\n' "${FILES[@]}"
 ```
 
-Next, gather the project context from CLAUDE.md and related documentation:
+## CLAUDE.md Configuration Check
 
-Use Read to load `/mnt/d/_wip/resumate-platform/CLAUDE.md` - this contains essential architecture patterns, tech stack, and coding standards.
+Before dispatching agents, determine CLAUDE.md configuration status.
 
-Store the key sections that are relevant for code review:
-- Project Overview and Tech Stack
+### If CLAUDE.md Does Not Exist
+
+Check for CLAUDE.md:
+```bash
+if [ ! -f "$PROJECT_ROOT/CLAUDE.md" ]; then
+  echo "NO_CLAUDE_MD=true"
+else
+  echo "NO_CLAUDE_MD=false"
+fi
+```
+
+If `NO_CLAUDE_MD=true`, use AskUserQuestion tool:
+- **Question**: "No CLAUDE.md found in project root. How would you like to proceed?"
+- **Options**:
+  1. **"Create CLAUDE.md with /init (Recommended)"** - Invoke `/init` skill to generate project documentation, then re-run `/omnibus-review`
+  2. **"Use plugin defaults"** - Use bundled `${CLAUDE_PLUGIN_ROOT}/templates/omnibus-defaults.md` for compliance checks
+
+### If CLAUDE.md Exists But Has No Omnibus Tags
+
+Check for omnibus-review tags:
+```bash
+if grep -q "omnibus-review:config\|omnibus-review:using-existing" "$PROJECT_ROOT/CLAUDE.md" 2>/dev/null; then
+  echo "OMNIBUS_CONFIGURED=true"
+else
+  echo "OMNIBUS_CONFIGURED=false"
+fi
+```
+
+If `OMNIBUS_CONFIGURED=false`, use AskUserQuestion tool:
+- **Question**: "Your CLAUDE.md doesn't have omnibus-review configuration. Add defaults for better visibility and customization?"
+- **Options**:
+  1. **"Yes, append defaults (Recommended)"** - Use Edit tool to append `${CLAUDE_PLUGIN_ROOT}/templates/omnibus-defaults.md` content to end of CLAUDE.md
+  2. **"No, use existing as-is"** - Use Edit tool to append acknowledgment tag to CLAUDE.md:
+     ```
+     
+     <!-- omnibus-review:using-existing - Plugin uses your existing guidelines without prompting again -->
+     ```
+     Inform user: "Added marker tag to CLAUDE.md. Remove the `omnibus-review:using-existing` comment to reset this choice."
+  3. **"No, use plugin defaults silently"** - Use bundled defaults without modifying CLAUDE.md (will prompt again next run)
+
+### Load Effective Guidelines
+
+After determining configuration, load the appropriate CLAUDE.md content:
+
+```bash
+# Set CLAUDE_MD_SOURCE for agent context
+if [ -f "$PROJECT_ROOT/CLAUDE.md" ]; then
+  CLAUDE_MD_SOURCE="$PROJECT_ROOT/CLAUDE.md"
+else
+  CLAUDE_MD_SOURCE="${CLAUDE_PLUGIN_ROOT}/templates/omnibus-defaults.md"
+fi
+```
+
+Use Read tool to load the content from `$CLAUDE_MD_SOURCE`.
+
+Store the key sections relevant for code review:
 - Architecture Patterns
-- Common Pitfalls (DO/DO NOT lists)
-- Testing Strategy
-- Directory Structure
+- Testing Requirements
+- Security Standards
+- Error Handling Standards
+- Code Quality Guidelines
+- DO NOT (Prohibited Patterns)
+
+When dispatching the claude-md-compliance agent, include `CLAUDE_MD_SOURCE` in the context string so it can report accurate rule sources.
 
 ## Phase 2: Dispatch 6 Parallel Review Agents
 

@@ -43,7 +43,7 @@ Return findings as structured JSON:
   "model": "opus",
   "timestamp": "2026-05-23T12:00:00Z",
   "files_analyzed": ["path/to/file.py"],
-  "claude_md_files": ["/mnt/d/_wip/resumate-platform/CLAUDE.md"],
+  "claude_md_files": ["<CLAUDE_MD_SOURCE from command context>"],
   "findings": [
     {
       "id": "compliance-001",
@@ -59,7 +59,7 @@ Return findings as structured JSON:
       "title": "Business logic in controller violates repository pattern",
       "description": "Controller directly accesses database instead of using service layer",
       "violated_rule": "Controllers -> Services -> Repositories -> Database Models",
-      "rule_source": "/mnt/d/_wip/resumate-platform/CLAUDE.md",
+      "rule_source": "<CLAUDE_MD_SOURCE from command context>",
       "rule_quote": "DO NOT: Put business logic in controllers\nDO: Follow repository pattern",
       "impact": "Breaks architectural separation, makes testing difficult",
       "fix": {
@@ -82,7 +82,9 @@ Return findings as structured JSON:
 **Important:**
 - Only report findings with confidence >= 80
 - Always quote the specific rule being violated
-- Include the source CLAUDE.md file path
+- Use the `CLAUDE_MD_SOURCE` path provided in the command context for the rule_source field
+- If source path contains "templates/omnibus-defaults.md", add "(plugin defaults)" suffix
+- When checking user's CLAUDE.md, prioritize `<!-- omnibus-review:config -->` tagged sections
 - Consider whether violations might be intentional and justified
 - Focus on explicit rules, not general best practices
 - Check both "DO" and "DO NOT" sections
