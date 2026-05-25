@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Palette - Omnibus Review</title>
+    <style>
+        :root {
+            --critical: #dc3545;
+            --high: #fd7e14;
+            --medium: #ffc107;
+            --low: #0d6efd;
+            --success: #198754;
+            --background: #f8f9fa;
+            --text: #212529;
+            --border: #dee2e6;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--background);
+            margin: 0;
+            padding: 20px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            color: var(--text);
+        }
+
+        h2 {
+            color: var(--text);
+            margin-top: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .nav-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--low);
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .color-card {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .color-swatch {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .color-info {
+            padding: 12px;
+            background: white;
+        }
+
+        .color-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .color-hex {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+
+        .color-var {
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            color: #6c757d;
+            margin-top: 4px;
+        }
+
+        .d2-example {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin: 15px 0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .usage-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .usage-table th,
+        .usage-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .usage-table th {
+            background: var(--background);
+            font-weight: 600;
+        }
+
+        .swatch-inline {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+
+        code {
+            background: var(--background);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            section, header {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Color Palette</h1>
+        <p>Reference colors for D2 diagrams matching the Omnibus Review design system</p>
+    </header>
+
+    <a href="../README.html" class="nav-link">← Back to README</a>
+
+    <section>
+        <h2>Primary Colors</h2>
+        <p>These colors are used throughout the documentation and should be used consistently in D2 diagrams.</p>
+
+        <div class="color-grid">
+            <div class="color-card">
+                <div class="color-swatch" style="background: #dc3545; color: white;">Critical</div>
+                <div class="color-info">
+                    <div class="color-name">Critical / Error</div>
+                    <div class="color-hex">#dc3545</div>
+                    <div class="color-var">--critical</div>
+                </div>
+            </div>
+
+            <div class="color-card">
+                <div class="color-swatch" style="background: #fd7e14; color: white;">High</div>
+                <div class="color-info">
+                    <div class="color-name">High / Warning</div>
+                    <div class="color-hex">#fd7e14</div>
+                    <div class="color-var">--high</div>
+                </div>
+            </div>
+
+            <div class="color-card">
+                <div class="color-swatch" style="background: #ffc107; color: #212529;">Medium</div>
+                <div class="color-info">
+                    <div class="color-name">Medium / Decision</div>
+                    <div class="color-hex">#ffc107</div>
+                    <div class="color-var">--medium</div>
+                </div>
+            </div>
+
+            <div class="color-card">
+                <div class="color-swatch" style="background: #0d6efd; color: white;">Low</div>
+                <div class="color-info">
+                    <div class="color-name">Low / Normal / Phase</div>
+                    <div class="color-hex">#0d6efd</div>
+                    <div class="color-var">--low</div>
+                </div>
+            </div>
+
+            <div class="color-card">
+                <div class="color-swatch" style="background: #198754; color: white;">Success</div>
+                <div class="color-info">
+                    <div class="color-name">Success / Complete</div>
+                    <div class="color-hex">#198754</div>
+                    <div class="color-var">--success</div>
+                </div>
+            </div>
+
+            <div class="color-card">
+                <div class="color-swatch" style="background: #f8f9fa; color: #212529; border: 1px solid #dee2e6;">Background</div>
+                <div class="color-info">
+                    <div class="color-name">Background / Container</div>
+                    <div class="color-hex">#f8f9fa</div>
+                    <div class="color-var">--background</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Usage Guide</h2>
+
+        <table class="usage-table">
+            <thead>
+                <tr>
+                    <th>Element</th>
+                    <th>Color</th>
+                    <th>D2 Style</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Phase boxes</td>
+                    <td><span class="swatch-inline" style="background: #0d6efd;"></span>Low (#0d6efd)</td>
+                    <td><code>style.fill: "#0d6efd"</code></td>
+                </tr>
+                <tr>
+                    <td>Decision diamonds</td>
+                    <td><span class="swatch-inline" style="background: #ffc107;"></span>Medium (#ffc107)</td>
+                    <td><code>style.fill: "#ffc107"</code></td>
+                </tr>
+                <tr>
+                    <td>Success states</td>
+                    <td><span class="swatch-inline" style="background: #198754;"></span>Success (#198754)</td>
+                    <td><code>style.fill: "#198754"</code></td>
+                </tr>
+                <tr>
+                    <td>Error states</td>
+                    <td><span class="swatch-inline" style="background: #dc3545;"></span>Critical (#dc3545)</td>
+                    <td><code>style.fill: "#dc3545"</code></td>
+                </tr>
+                <tr>
+                    <td>Containers/Groups</td>
+                    <td><span class="swatch-inline" style="background: #f8f9fa; border: 1px solid #dee2e6;"></span>Background (#f8f9fa)</td>
+                    <td><code>style.fill: "#f8f9fa"</code></td>
+                </tr>
+                <tr>
+                    <td>Text on dark backgrounds</td>
+                    <td><span class="swatch-inline" style="background: white; border: 1px solid #dee2e6;"></span>White</td>
+                    <td><code>style.font-color: white</code></td>
+                </tr>
+                <tr>
+                    <td>Text on light backgrounds</td>
+                    <td><span class="swatch-inline" style="background: #212529;"></span>Text (#212529)</td>
+                    <td><code>style.font-color: "#212529"</code></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>D2 Examples</h2>
+
+        <h3>Phase Box (Blue)</h3>
+        <div class="d2-example">phase1: Phase 1: SCOPE {
+  style.fill: "#0d6efd"
+  style.font-color: white
+  style.border-radius: 8
+}</div>
+
+        <h3>Decision Diamond (Yellow)</h3>
+        <div class="d2-example">check: Staged changes? {
+  shape: diamond
+  style.fill: "#ffc107"
+  style.font-color: "#212529"
+}</div>
+
+        <h3>Success State (Green)</h3>
+        <div class="d2-example">complete: SUCCESS {
+  style.fill: "#198754"
+  style.font-color: white
+  style.border-radius: 8
+}</div>
+
+        <h3>Error State (Red)</h3>
+        <div class="d2-example">error: ERROR {
+  style.fill: "#dc3545"
+  style.font-color: white
+  style.border-radius: 8
+}</div>
+
+        <h3>Container Group</h3>
+        <div class="d2-example">group: "Group Label" {
+  style.fill: "#f8f9fa"
+  style.stroke: "#dee2e6"
+}</div>
+    </section>
+
+    <section>
+        <h2>Regenerating Diagrams</h2>
+        <p>To regenerate SVGs after editing D2 files:</p>
+        <div class="d2-example">./scripts/regenerate-diagrams.sh</div>
+        <p>The script requires D2 CLI. Install with:</p>
+        <div class="d2-example"># macOS
+brew install d2
+
+# Linux
+curl -fsSL https://d2lang.com/install.sh | sh
+
+# Windows
+scoop install d2</div>
+    </section>
+
+    <footer style="margin-top: 40px; padding: 20px; text-align: center; color: #6c757d; border-top: 1px solid var(--border);">
+        <p><a href="../README.html" style="color: var(--low);">Back to README</a></p>
+    </footer>
+</body>
+</html>
