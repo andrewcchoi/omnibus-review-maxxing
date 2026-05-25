@@ -604,34 +604,210 @@ End with the exit phrase:
 <promise>QUANTUM_EIGENSTATE_CRYSTALLIZED_OMEGA</promise>
 ```
 
-### Fix Mode
+### Fix Mode (Parallel Subagent Architecture)
 
-If `FIX_MODE=true`, initialize Ralph Loop for iterative fixing:
+If `FIX_MODE=true`, execute the parallel fix-validate-rereview loop:
 
-1. **Save findings to temp file**: Write aggregated findings JSON to `$TMPDIR/omnibus-findings.json`
+**IMPORTANT**: No confirmation prompts. All agreed-upon issues are fixed automatically.
+Fixes must be COMPLETE - not shortcuts, easy fixes, or fast fixes. The fix must fully
+resolve the issue AND fit into the existing architecture.
 
-2. **Initialize Ralph Loop**: Execute the Ralph Loop setup script:
+#### Step 1: Initialize Loop State
+
 ```bash
 bash "${CLAUDE_PLUGIN_ROOT}/scripts/setup-review-loop.sh" \
-  --findings "$TMPDIR/omnibus-findings.json" \
-  --max-iterations "$MAX_ITERATIONS" \
-  --model "$([ "$USE_OPUS" = true ] && echo 'opus' || echo 'sonnet')"
+  --max-iterations "$MAX_ITERATIONS"
 ```
 
-3. **Report initialization**:
+Set `CURRENT_ITERATION=1`
+
+#### Step 2: Group Findings by File
+
+From the aggregated findings, create a map of `file_path -> [findings]`:
+
 ```
-=== Omnibus Review with Iterative Fixing ===
-
-Initial findings: ${TOTAL_FINDINGS} issues
-Max iterations: ${MAX_ITERATIONS}
-Model: ${MODEL_NAME}
-
-Ralph Loop initialized. Starting iterative fixing...
-
-[The script will handle the loop execution and re-review cycles]
+files_with_findings = {
+  "src/auth.py": [F1, F2, F5],
+  "src/api.py": [F3],
+  "src/utils.py": [F4, F6, F7]
+}
 ```
 
-4. **Exit phrase**: After Ralph Loop completes (or in any error case), output:
+#### Step 3: Generate Fix Plans
+
+For each file with findings, generate a fix plan YAML:
+
+```yaml
+file: src/auth.py
+iteration: 1
+architecture_context: |
+  ${RELEVANT_CLAUDE_MD_SECTIONS}
+  
+  CRITICAL: Apply COMPLETE fixes only. No shortcuts.
+  - Address root cause, not just symptom
+  - Handle all edge cases
+  - Follow existing patterns in codebase
+  - Maintain type safety
+  - Document any divergence with reason
+findings:
+  - id: F1
+    title: "SQL injection in login query"
+    severity: critical
+    line_start: 42
+    line_end: 45
+    description: "User input concatenated into SQL string"
+    planned_fix: "Use parameterized query with execute(query, [params])"
+    status: pending
+    actual_fix: null
+    divergence_reason: null
+    
+  - id: F2
+    title: "Missing null check on user"
+    severity: high
+    line_start: 67
+    line_end: 67
+    description: "user.email accessed without null check"
+    planned_fix: "Add guard clause with proper error response"
+    status: pending
+    actual_fix: null
+    divergence_reason: null
+```
+
+Write each plan to `$TMPDIR/fix-plan-{file_hash}.yaml`
+
+#### Step 4: Dispatch Parallel Fixer Subagents
+
+Launch one `omnibus-fixer` subagent per file IN PARALLEL using the Agent tool:
+
+```
+For each file in files_with_findings:
+  Agent(
+    subagent_type: "omnibus-review:omnibus-fixer",
+    description: "Fix issues in {filename}",
+    prompt: |
+      Fix all issues in this file following the fix plan.
+      
+      REQUIREMENTS:
+      - Apply COMPLETE fixes only (no shortcuts)
+      - Fixes must fit existing architecture
+      - Update plan status as you work
+      - Document any divergence with clear reason
+      
+      Fix Plan:
+      {fix_plan_yaml}
+      
+      Return the updated fix plan YAML when done.
+  )
+```
+
+**All fixer subagents run in parallel** - they work on different files so no conflicts.
+
+Collect all updated fix plans from subagent responses.
+
+#### Step 5: Dispatch Parallel Validator Subagents
+
+Launch one `omnibus-validator` subagent per fixed file IN PARALLEL:
+
+```
+For each file that was fixed:
+  Agent(
+    subagent_type: "omnibus-review:omnibus-validator",
+    description: "Validate fixes in {filename}",
+    prompt: |
+      Validate that fixes were applied correctly and completely.
+      
+      VALIDATION CRITERIA:
+      - Verify each fix was actually applied
+      - Check fixes are COMPLETE (not shortcuts)
+      - Validate architecture alignment
+      - Assess divergence reasons
+      - Check for regressions
+      
+      File: {file_path}
+      Updated Fix Plan:
+      {updated_fix_plan_yaml}
+      
+      Return validation report YAML.
+  )
+```
+
+**All validator subagents run in parallel** - they only read, no conflicts.
+
+Collect all validation reports.
+
+#### Step 6: Assess Validation Results
+
+Parse validation reports and determine:
+
+1. **Fully validated files**: All fixes passed validation
+2. **Partially validated files**: Some fixes failed
+3. **Failed files**: Major issues, regressions, or incomplete fixes
+
+For failed/partial validations, log the issues:
+```
+=== Validation Issues ===
+File: src/auth.py
+  - F2: Fix claimed but not found in diff
+  - Regression: Error handling removed at line 50
+
+File: src/utils.py
+  - F4: Incomplete fix - only handles one edge case
+```
+
+#### Step 7: Re-Review (Iteration Check)
+
+Run the 6 review agents again on ONLY the files that were modified:
+
+```bash
+FIXED_FILES=$(git diff --name-only HEAD)
+```
+
+Dispatch review agents (same as Phase 2) scoped to `FIXED_FILES`.
+
+Aggregate new findings.
+
+#### Step 8: Iteration Decision
+
+```
+if no CRITICAL or HIGH findings remain:
+  status = "COMPLETE"
+  output: <promise>QUANTUM_EIGENSTATE_CRYSTALLIZED_OMEGA</promise>
+  
+elif CURRENT_ITERATION >= MAX_ITERATIONS:
+  status = "MAX_ITERATIONS_REACHED"
+  output remaining issues summary
+  output: <promise>QUANTUM_EIGENSTATE_CRYSTALLIZED_OMEGA</promise>
+  
+else:
+  CURRENT_ITERATION += 1
+  Update loop state file
+  GOTO Step 2 with new findings
+```
+
+#### Step 9: Final Report
+
+After loop completes (success or max iterations):
+
+```
+=== Omnibus Review + Fix Complete ===
+
+Iterations: ${CURRENT_ITERATION}
+Status: ${STATUS}
+
+Files fixed: ${FILES_FIXED_COUNT}
+Issues resolved: ${RESOLVED_COUNT}
+Issues remaining: ${REMAINING_COUNT}
+
+${IF_REMAINING}
+Remaining issues require manual attention:
+[List remaining CRITICAL/HIGH issues]
+${ENDIF}
+
+Fix plans archived to: .omnibus-review/fix-plans-${TIMESTAMP}/
+Validation reports: .omnibus-review/validation-${TIMESTAMP}/
+```
+
+End with exit phrase:
 ```
 <promise>QUANTUM_EIGENSTATE_CRYSTALLIZED_OMEGA</promise>
 ```
@@ -640,7 +816,7 @@ Ralph Loop initialized. Starting iterative fixing...
 
 The following error scenarios require specific handling:
 
-1. **Agent fails to return valid JSON**:
+1. **Review agent fails to return valid JSON**:
    - Retry the agent call once with clarified instructions
    - If second attempt fails, skip that agent and note "Agent error: [agent-name]" in final summary
    - Continue with remaining agents
@@ -650,19 +826,41 @@ The following error scenarios require specific handling:
    - Note "Agent timeout: [agent-name]" in final summary
    - Continue with remaining agents
 
-3. **Ralph Loop script missing** (in --fix mode):
+3. **Fixer subagent fails**:
+   - Log the failure: "Fixer failed for {file}: {error}"
+   - Mark all findings for that file as `status: fixer_error`
+   - Continue with other files - do not block the entire fix phase
+   - Include failed file in re-review to catch if partial fixes were applied
+
+4. **Validator subagent fails**:
+   - Log the failure: "Validator failed for {file}: {error}"
+   - Treat file as "unvalidated" - include in re-review
+   - Do not count as validated for iteration decision
+
+5. **Validation fails (fixes incomplete)**:
+   - Do NOT retry immediately - let re-review catch it
+   - Log which fixes failed validation and why
+   - Next iteration will generate new fix plans for remaining issues
+
+6. **Loop state file missing** (in --fix mode):
    - Check if `${CLAUDE_PLUGIN_ROOT}/scripts/setup-review-loop.sh` exists
-   - If missing, warn: "Ralph Loop script not found - continuing in report-only mode"
+   - If missing, warn: "Loop setup script not found - continuing in report-only mode"
    - Fall back to report mode behavior
 
-4. **Git diff fails** (empty working directory or git not available):
+7. **Git diff fails** (empty working directory or git not available):
    - Require explicit file list: "ERROR: No files to review. Either specify files explicitly or ensure you have uncommitted changes."
    - Exit with code 1
 
-5. **JSON parsing issues**:
-   - Try ```json fenced blocks first
-   - Fall back to raw JSON detection (look for object/array boundaries)
-   - If both fail, treat as "Agent fails to return valid JSON" (retry once)
+8. **JSON/YAML parsing issues**:
+   - For JSON: Try ```json fenced blocks first, fall back to raw JSON detection
+   - For YAML: Try ```yaml fenced blocks first, fall back to raw YAML
+   - If both fail, retry agent once with explicit format instructions
+
+9. **Cross-file dependency detected**:
+   - If a fixer reports it cannot fully fix without changing another file:
+   - Log the dependency
+   - Mark finding as `status: cross_file_dependency`
+   - On next iteration, group related files into single fixer if possible
 
 ## Phase 5: Write Handoff File (Context Isolation)
 
@@ -766,10 +964,43 @@ This brief context is all that transfers to the next iteration - full findings a
 
 ## Implementation Notes
 
+### General
 - All file paths should be absolute paths from the repository root
 - Relative paths are normalized to absolute in Phase 1 (prepend repository root)
-- Agent tool calls use bare agent names (e.g., "correctness-auditor") - they're local to this plugin
-- JSON parsing should be robust - handle both fenced code blocks and raw JSON
+- Agent tool calls use plugin-namespaced names (e.g., "omnibus-review:correctness-auditor")
+- JSON/YAML parsing should be robust - handle both fenced code blocks and raw content
 - Deduplication algorithm: use a map keyed by file path, then check line overlaps within same file
-- The Ralph Loop script (Task 4) handles the iterative fix-review cycle
 - Always output the exit phrase at the end, regardless of success or failure
+
+### Parallel Subagent Architecture (Fix Mode)
+- Fixer and validator subagents are dispatched using the Agent tool with `run_in_background: false`
+- Multiple Agent tool calls in single message = parallel execution
+- Each subagent receives ONLY its file + findings (minimal context, no compaction needed)
+- Subagents use `subagent_type: "omnibus-review:omnibus-fixer"` or `"omnibus-review:omnibus-validator"`
+- Fix plans are YAML for human readability and easy parsing
+- Validation reports are YAML for structured assessment
+
+### Fix Quality Standards
+- NO confirmation prompts in --fix mode
+- COMPLETE fixes only - address root cause, not symptoms
+- Fixes MUST fit existing architecture (patterns from CLAUDE.md)
+- Divergence requires documented reason (why alternative was better)
+- Validators catch shortcuts and incomplete fixes
+- Re-review catches any new issues introduced
+
+### Iteration Loop
+- Loop continues until no CRITICAL/HIGH issues OR max iterations reached
+- Each iteration: Plan → Fix (parallel) → Validate (parallel) → Re-Review
+- State tracked in `.claude/omnibus-review-loop.local.md`
+- Handoff file updated after each iteration for debugging/visibility
+
+### Context Isolation
+- Review phase: 6 agents in current context
+- Fix phase: NEW subagents with fresh context (only file + plan)
+- Validation phase: NEW subagents with fresh context (only file + plan + diff)
+- Re-review: Agents receive only modified files, not full history
+- This prevents context bloat and eliminates compaction during fix loop
+
+### Diagram Reference
+- See `docs/omnibus-workflow.d2` for visual workflow diagram
+- Render with: `d2 docs/omnibus-workflow.d2 docs/omnibus-workflow.svg`

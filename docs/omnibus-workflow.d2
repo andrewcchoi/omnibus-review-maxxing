@@ -1,0 +1,427 @@
+# Omnibus Review Workflow
+# Complete flow from review to validated fix with iteration loop
+
+direction: down
+
+title: {
+  label: Omnibus Review + Fix Workflow
+  near: top-center
+  shape: text
+  style.font-size: 24
+  style.bold: true
+}
+
+# ============================================
+# PHASE 1: REVIEW
+# ============================================
+
+review_phase: Review Phase {
+  style.fill: "#dbeafe"
+
+  input: {
+    label: "Files to Review\n(git diff or explicit)"
+    shape: document
+  }
+
+  dispatch: {
+    label: "Dispatch 6 Review Agents\n(parallel)"
+    shape: hexagon
+  }
+
+  agents: {
+    style.fill: "#eff6ff"
+
+    correctness: Correctness Auditor {
+      shape: person
+      style.fill: "#93c5fd"
+    }
+    security: Security Sentinel {
+      shape: person
+      style.fill: "#93c5fd"
+    }
+    compliance: CLAUDE.md Compliance {
+      shape: person
+      style.fill: "#93c5fd"
+    }
+    coverage: Test Coverage {
+      shape: person
+      style.fill: "#93c5fd"
+    }
+    silent: Silent Failure Hunter {
+      shape: person
+      style.fill: "#93c5fd"
+    }
+    quality: Code Quality {
+      shape: person
+      style.fill: "#93c5fd"
+    }
+  }
+
+  aggregate: {
+    label: "Aggregate & Deduplicate\nFilter confidence >= 80"
+    shape: parallelogram
+  }
+
+  findings: {
+    label: "Aggregated Findings\n(JSON)"
+    shape: document
+    style.fill: "#fef3c7"
+  }
+
+  input -> dispatch
+  dispatch -> agents.correctness
+  dispatch -> agents.security
+  dispatch -> agents.compliance
+  dispatch -> agents.coverage
+  dispatch -> agents.silent
+  dispatch -> agents.quality
+  agents.correctness -> aggregate
+  agents.security -> aggregate
+  agents.compliance -> aggregate
+  agents.coverage -> aggregate
+  agents.silent -> aggregate
+  agents.quality -> aggregate
+  aggregate -> findings
+}
+
+# ============================================
+# DECISION: FIX MODE?
+# ============================================
+
+fix_decision: {
+  label: "--fix flag?"
+  shape: diamond
+  style.fill: "#fef3c7"
+}
+
+report_output: {
+  label: "Output Report\n(text or HTML)"
+  shape: document
+  style.fill: "#d1fae5"
+}
+
+done_report: {
+  label: "Done\n(report only)"
+  shape: oval
+  style.fill: "#d1fae5"
+}
+
+review_phase.findings -> fix_decision
+fix_decision -> report_output: No
+report_output -> done_report
+
+# ============================================
+# PHASE 2: PLANNING
+# ============================================
+
+planning_phase: Planning Phase {
+  style.fill: "#fef3c7"
+
+  group_by_file: {
+    label: "Group Findings by File"
+    shape: parallelogram
+  }
+
+  generate_plans: {
+    label: "Generate Fix Plans\n(one per file)"
+    shape: hexagon
+  }
+
+  plans: {
+    style.fill: "#fffbeb"
+
+    plan_a: {
+      label: "Fix Plan: auth.py\n- F1: SQL injection\n- F2: Missing null check"
+      shape: document
+    }
+    plan_b: {
+      label: "Fix Plan: api.py\n- F3: Race condition"
+      shape: document
+    }
+    plan_n: {
+      label: "Fix Plan: utils.py\n- F4: Silent exception"
+      shape: document
+    }
+  }
+
+  group_by_file -> generate_plans
+  generate_plans -> plans.plan_a
+  generate_plans -> plans.plan_b
+  generate_plans -> plans.plan_n
+}
+
+fix_decision -> planning_phase.group_by_file: Yes
+
+# ============================================
+# PHASE 3: FIX (Parallel Subagents)
+# ============================================
+
+fix_phase: Fix Phase {
+  style.fill: "#fce7f3"
+
+  dispatch_fixers: {
+    label: "Dispatch Fixer Subagents\n(parallel, one per file)"
+    shape: hexagon
+  }
+
+  fixers: {
+    style.fill: "#fdf2f8"
+
+    fixer_a: {
+      label: |md
+        **Fixer: auth.py**
+        - Read file + plan
+        - Apply COMPLETE fixes
+        - Update plan status
+        - Document divergence
+      |
+      shape: person
+      style.fill: "#f9a8d4"
+    }
+    fixer_b: {
+      label: |md
+        **Fixer: api.py**
+        - Read file + plan
+        - Apply COMPLETE fixes
+        - Update plan status
+        - Document divergence
+      |
+      shape: person
+      style.fill: "#f9a8d4"
+    }
+    fixer_n: {
+      label: |md
+        **Fixer: utils.py**
+        - Read file + plan
+        - Apply COMPLETE fixes
+        - Update plan status
+        - Document divergence
+      |
+      shape: person
+      style.fill: "#f9a8d4"
+    }
+  }
+
+  updated_plans: {
+    label: "Updated Plans\n(with actual fixes)"
+    shape: document
+    style.fill: "#fbcfe8"
+  }
+
+  dispatch_fixers -> fixers.fixer_a
+  dispatch_fixers -> fixers.fixer_b
+  dispatch_fixers -> fixers.fixer_n
+  fixers.fixer_a -> updated_plans
+  fixers.fixer_b -> updated_plans
+  fixers.fixer_n -> updated_plans
+}
+
+planning_phase.plans.plan_a -> fix_phase.dispatch_fixers
+planning_phase.plans.plan_b -> fix_phase.dispatch_fixers
+planning_phase.plans.plan_n -> fix_phase.dispatch_fixers
+
+# ============================================
+# PHASE 4: VALIDATION (Parallel Subagents)
+# ============================================
+
+validation_phase: Validation Phase {
+  style.fill: "#d1fae5"
+
+  dispatch_validators: {
+    label: "Dispatch Validator Subagents\n(parallel, one per file)"
+    shape: hexagon
+  }
+
+  validators: {
+    style.fill: "#ecfdf5"
+
+    validator_a: {
+      label: |md
+        **Validator: auth.py**
+        - Read plan + git diff
+        - Verify each fix applied
+        - Check architecture fit
+        - Flag incomplete fixes
+      |
+      shape: person
+      style.fill: "#6ee7b7"
+    }
+    validator_b: {
+      label: |md
+        **Validator: api.py**
+        - Read plan + git diff
+        - Verify each fix applied
+        - Check architecture fit
+        - Flag incomplete fixes
+      |
+      shape: person
+      style.fill: "#6ee7b7"
+    }
+    validator_n: {
+      label: |md
+        **Validator: utils.py**
+        - Read plan + git diff
+        - Verify each fix applied
+        - Check architecture fit
+        - Flag incomplete fixes
+      |
+      shape: person
+      style.fill: "#6ee7b7"
+    }
+  }
+
+  validation_report: {
+    label: "Validation Reports\n(pass/fail per finding)"
+    shape: document
+    style.fill: "#a7f3d0"
+  }
+
+  dispatch_validators -> validators.validator_a
+  dispatch_validators -> validators.validator_b
+  dispatch_validators -> validators.validator_n
+  validators.validator_a -> validation_report
+  validators.validator_b -> validation_report
+  validators.validator_n -> validation_report
+}
+
+fix_phase.updated_plans -> validation_phase.dispatch_validators
+
+# ============================================
+# PHASE 5: RE-REVIEW (Iteration Check)
+# ============================================
+
+rereview_phase: Re-Review Phase {
+  style.fill: "#e0e7ff"
+
+  run_review: {
+    label: "Run Review Agents\n(on fixed files only)"
+    shape: hexagon
+  }
+
+  new_findings: {
+    label: "New Findings\n(if any)"
+    shape: document
+    style.fill: "#c7d2fe"
+  }
+
+  run_review -> new_findings
+}
+
+validation_phase.validation_report -> rereview_phase.run_review
+
+# ============================================
+# ITERATION DECISION
+# ============================================
+
+iteration_decision: {
+  label: "CRITICAL or HIGH\nissues remain?"
+  shape: diamond
+  style.fill: "#fef3c7"
+}
+
+max_iterations: {
+  label: "Max iterations\nreached?"
+  shape: diamond
+  style.fill: "#fee2e2"
+}
+
+rereview_phase.new_findings -> iteration_decision
+
+# ============================================
+# ITERATION LOOP
+# ============================================
+
+iteration_loop: {
+  label: "ITERATION LOOP"
+  shape: text
+  style.font-size: 14
+  style.bold: true
+  style.fill: "#fecaca"
+}
+
+iteration_decision -> max_iterations: Yes
+max_iterations -> planning_phase.group_by_file: No {
+  style.stroke: "#ef4444"
+  style.stroke-width: 3
+  label: "Loop back\nwith new findings"
+}
+
+# ============================================
+# COMPLETION STATES
+# ============================================
+
+done_success: {
+  label: "Done\n(all issues resolved)"
+  shape: oval
+  style.fill: "#d1fae5"
+  style.stroke: "#10b981"
+  style.stroke-width: 3
+}
+
+done_max_iter: {
+  label: "Done\n(max iterations reached)\nManual review needed"
+  shape: oval
+  style.fill: "#fee2e2"
+  style.stroke: "#ef4444"
+  style.stroke-width: 2
+}
+
+iteration_decision -> done_success: No
+max_iterations -> done_max_iter: Yes
+
+# ============================================
+# LEGEND
+# ============================================
+
+legend: Legend {
+  style.fill: "#f3f4f6"
+
+  subagent: {
+    label: "Subagent"
+    shape: person
+    style.fill: "#93c5fd"
+  }
+
+  document: {
+    label: "Document/Data"
+    shape: document
+    style.fill: "#fef3c7"
+  }
+
+  process: {
+    label: "Process"
+    shape: hexagon
+    style.fill: "#e5e7eb"
+  }
+
+  decision: {
+    label: "Decision"
+    shape: diamond
+    style.fill: "#fef3c7"
+  }
+
+  iteration_arrow: {
+    label: "Iteration Path"
+    shape: text
+    style.fill: "#fecaca"
+  }
+}
+
+# ============================================
+# KEY PRINCIPLES (annotation)
+# ============================================
+
+principles: {
+  label: |md
+    **Fix Principles (--fix mode)**
+
+    ✓ No confirmation prompts
+    ✓ Complete fixes only (no shortcuts)
+    ✓ Must fit existing architecture
+    ✓ Document any divergence with reason
+    ✓ Validator verifies completeness
+  |
+  shape: text
+  style.font-size: 12
+  near: bottom-right
+}
