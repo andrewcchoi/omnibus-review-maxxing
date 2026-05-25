@@ -61,11 +61,22 @@
             padding: 20px;
             border: 2px solid var(--border);
             border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            line-height: 1.5;
             overflow-x: auto;
             margin: 20px 0;
+            text-align: center;
+        }
+
+        .diagram img, .diagram svg {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .diagram img, .diagram svg {
+                min-width: 600px;
+            }
         }
 
         .phase {
@@ -143,9 +154,16 @@
 
     <a href="../README.html" class="nav-link">← Back to README</a>
 
-    <section>
+    <section id="complete-workflow">
         <h2>Complete Workflow Overview</h2>
         <div class="diagram">
+            <img src="../diagrams/svg/architecture-full.svg"
+                 alt="Complete 4-phase workflow: Pre-review validation, Parallel specialist review with 6 agents, Aggregation and prioritization, Fix cycle"
+                 role="img">
+        </div>
+    </section>
+
+    <!-- ORIGINAL ASCII DIAGRAM PRESERVED FOR ROLLBACK
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                              USER INVOKES                                    │
 │                         /omnibus-review [OPTIONS]                            │
@@ -253,8 +271,7 @@
 ┃  PHASE 4: FIX CYCLE  ┃         │  Present Report  │
 ┗━━━━━━━━━━━━━━━━━━━━━━┛         │   EXIT SUCCESS   │
                                  └──────────────────┘
-        </div>
-    </section>
+    END ORIGINAL ASCII DIAGRAM -->
 
     <section>
         <h2>Phase 1: Pre-Review Validation</h2>
@@ -300,32 +317,13 @@
         </div>
     </section>
 
-    <section>
+    <section id="parallel-dispatch">
         <h2>Phase 2: Parallel Specialist Review</h2>
 
         <div class="diagram">
-┌─────────────────────────────────────────────────────────────────────┐
-│                    PARALLEL AGENT DISPATCH                           │
-│                                                                      │
-│  Master Thread:                                                      │
-│  ┌──────────────────────────────────────────────────────────────┐  │
-│  │  for agent in [security, architecture, correctness,          │  │
-│  │                 performance, test, style]:                    │  │
-│  │      launch_agent(agent, context, config)                    │  │
-│  │                                                               │  │
-│  │  wait_for_all_agents()                                       │  │
-│  │  collect_results()                                           │  │
-│  └──────────────────────────────────────────────────────────────┘  │
-│                                                                      │
-│  Agent Execution (isolated):                                        │
-│  ┌──────────────────────────────────────────────────────────────┐  │
-│  │  1. Receive context package                                  │  │
-│  │  2. Read staged diff + related files                         │  │
-│  │  3. Apply domain expertise with ultrathink                   │  │
-│  │  4. Generate findings with confidence scores                 │  │
-│  │  5. Return structured JSON report                            │  │
-│  └──────────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────┘
+            <img src="../diagrams/svg/parallel-dispatch.svg"
+                 alt="Parallel agent dispatch: 6 agents running concurrently - Security, Architecture, Correctness, Performance, Test, Style"
+                 role="img">
         </div>
 
         <div class="phase">
@@ -350,57 +348,17 @@
         </div>
     </section>
 
-    <section>
+    <section id="aggregation-pipeline">
         <h2>Phase 3: Aggregation & Prioritization</h2>
 
         <div class="diagram">
-INPUT: 6 Agent Reports (JSON)
-  ↓
-┌─────────────────────────────────────────────────────────────┐
-│ Step 1: Deduplication                                       │
-│ ────────────────────────────────────────────────────────    │
-│ • Hash each finding: (file, line, category, description)   │
-│ • Group identical findings                                  │
-│ • Retain highest confidence version                         │
-│ • Track which agents agreed                                 │
-│                                                             │
-│ Example:                                                    │
-│   Security Agent: "SQL injection at users.py:45"           │
-│   Correctness Agent: "Unvalidated input at users.py:45"    │
-│   → Merged as one issue with both perspectives             │
-└─────────────────────────────────────────────────────────────┘
-  ↓
-┌─────────────────────────────────────────────────────────────┐
-│ Step 2: Severity Assignment                                 │
-│ ────────────────────────────────────────────────────────    │
-│ • Apply severity matrix (see severity-guide.html)          │
-│ • Consider impact + exploitability                         │
-│ • Upgrade severity if multiple agents agree                │
-│ • Factor in project context (prod vs dev)                  │
-└─────────────────────────────────────────────────────────────┘
-  ↓
-┌─────────────────────────────────────────────────────────────┐
-│ Step 3: Grouping Related Issues                            │
-│ ────────────────────────────────────────────────────────    │
-│ • Cluster by root cause                                    │
-│ • Link dependent issues (fix A enables fix B)              │
-│ • Create issue families (same pattern repeated)            │
-│ • Suggest batch fixes where applicable                     │
-└─────────────────────────────────────────────────────────────┘
-  ↓
-┌─────────────────────────────────────────────────────────────┐
-│ Step 4: Confidence Filtering                               │
-│ ────────────────────────────────────────────────────────    │
-│ • Remove findings below threshold (default 0.7)            │
-│ • Retain if multiple agents agree (even if lower conf)     │
-│ • Flag uncertain findings for human review                 │
-└─────────────────────────────────────────────────────────────┘
-  ↓
-OUTPUT: Consolidated Review Report
+            <img src="../diagrams/svg/aggregation-pipeline.svg"
+                 alt="Aggregation pipeline: Deduplication, Severity Assignment, Grouping, Confidence Filtering to produce consolidated report"
+                 role="img">
         </div>
     </section>
 
-    <section>
+    <section id="ralph-loop">
         <h2>Phase 4: Ralph Loop Fix Cycle</h2>
 
         <div class="decision">
@@ -414,81 +372,9 @@ OUTPUT: Consolidated Review Report
         </div>
 
         <div class="diagram">
-┌─────────────────────────────────────────────────────────────────────┐
-│                      RALPH LOOP FIX CYCLE                            │
-└─────────────────────────────────────────────────────────────────────┘
-                                │
-                                ▼
-                    ┌────────────────────────┐
-                    │ Initialize Fix Queue   │
-                    │  CRITICAL first        │
-                    │  Then HIGH             │
-                    └────────────────────────┘
-                                │
-                                ▼
-                    ┌────────────────────────┐
-                    │  Iteration Counter = 0 │
-                    └────────────────────────┘
-                                │
-                ┌───────────────┴───────────────┐
-                ▼                               ▼
-    ┌──────────────────────┐        ┌──────────────────────┐
-    │ More issues to fix?  │        │ Max iterations       │
-    │       YES            │        │   reached?           │
-    └──────────────────────┘        └──────────────────────┘
-                │                               │
-                ▼                               │ YES
-    ┌──────────────────────┐                   │
-    │ Pop next issue       │                   │
-    │ from priority queue  │                   │
-    └──────────────────────┘                   │
-                │                               │
-                ▼                               │
-    ┌──────────────────────┐                   │
-    │  Apply automated fix │                   │
-    │  • Edit relevant     │                   │
-    │    files             │                   │
-    │  • Run formatters    │                   │
-    │  • Stage changes     │                   │
-    └──────────────────────┘                   │
-                │                               │
-                ▼                               │
-    ┌──────────────────────┐                   │
-    │  Run test suite      │                   │
-    └──────────────────────┘                   │
-                │                               │
-           ╱────┴────╲                          │
-      PASS ╱          ╲ FAIL                    │
-          ╱            ╲                        │
-         ▼              ▼                       │
-┌──────────────┐  ┌────────────────┐           │
-│ Mark fixed   │  │ Rollback fix   │           │
-│ Remove from  │  │ Mark as failed │           │
-│ queue        │  │ Continue       │           │
-└──────────────┘  └────────────────┘           │
-         │              │                       │
-         └──────────────┘                       │
-                │                               │
-                ▼                               │
-    ┌──────────────────────┐                   │
-    │ Increment iteration  │                   │
-    └──────────────────────┘                   │
-                │                               │
-                └───────────────────────────────┘
-                                │
-                                ▼
-                    ┌────────────────────────┐
-                    │   Re-run Full Review   │
-                    │   Verify fixes worked  │
-                    └────────────────────────┘
-                                │
-                                ▼
-                    ┌────────────────────────┐
-                    │  Generate Fix Summary  │
-                    │  • Issues resolved     │
-                    │  • Issues failed       │
-                    │  • Iterations used     │
-                    └────────────────────────┘
+            <img src="../diagrams/svg/ralph-loop.svg"
+                 alt="Ralph Loop fix cycle: Initialize queue, pop issues, apply fixes, run tests, mark fixed or rollback, repeat until done"
+                 role="img">
         </div>
 
         <div class="success-path">

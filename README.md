@@ -42,25 +42,7 @@ A comprehensive Claude Code review plugin combining 6 specialized agents with Ra
 
 ## Workflow
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    OMNIBUS REVIEW WORKFLOW                      │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                 │
-│  Phase 1: SCOPE          Determine files to review              │
-│           ↓              (git diff or explicit paths)           │
-│                                                                 │
-│  Phase 2: DISPATCH       Launch 6 agents in parallel            │
-│           ↓              (all use Opus + ultrathink)            │
-│                                                                 │
-│  Phase 3: AGGREGATE      Merge findings, filter <80 confidence  │
-│           ↓              Deduplicate, sort by severity          │
-│                                                                 │
-│  Phase 4: REPORT/FIX     Output report OR enter Ralph Loop      │
-│                          Fix CRITICAL→HIGH until resolved       │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
+![Workflow Overview](diagrams/svg/workflow-overview.svg)
 
 ## Severity Levels
 

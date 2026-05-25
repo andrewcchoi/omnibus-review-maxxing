@@ -279,74 +279,13 @@
         </div>
     </section>
 
-    <section>
+    <section id="architecture">
         <h2>Architecture</h2>
-        <div class="architecture">
-┌─────────────────────────────────────────────────────────────────────┐
-│                         OMNIBUS REVIEW                               │
-│                    Entry Point: /omnibus-review                      │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│  PHASE 1: Pre-Review Validation & Context Gathering                 │
-│  ─────────────────────────────────────────────────────────────────  │
-│  • Validate git status (staged changes required)                    │
-│  • Read existing documentation (CLAUDE.md, README, etc.)            │
-│  • Analyze project structure and dependencies                       │
-│  • Identify technology stack and patterns                           │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│  PHASE 2: Parallel Specialist Review (6 Agents)                     │
-│  ─────────────────────────────────────────────────────────────────  │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │
-│  │   Security   │  │ Architecture │  │  Correctness │              │
-│  │   Analyst    │  │   Reviewer   │  │   Verifier   │              │
-│  └──────────────┘  └──────────────┘  └──────────────┘              │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │
-│  │ Performance  │  │     Test     │  │     Code     │              │
-│  │   Auditor    │  │   Evaluator  │  │    Style     │              │
-│  └──────────────┘  └──────────────┘  └──────────────┘              │
-│                                                                      │
-│  Model: Claude Opus 4.5 + ultrathink extended thinking              │
-│  Method: Independent analysis with isolated context                 │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│  PHASE 3: Aggregation & Prioritization                              │
-│  ─────────────────────────────────────────────────────────────────  │
-│  • Collect findings from all agents                                 │
-│  • Deduplicate identical issues (same file + line + type)           │
-│  • Group related issues into clusters                               │
-│  • Apply severity scoring (CRITICAL → LOW)                          │
-│  • Filter by confidence threshold (>0.7)                            │
-│  • Generate consolidated report with actionable recommendations     │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│  PHASE 4: Automated Fix Cycle (Optional)                            │
-│  ─────────────────────────────────────────────────────────────────  │
-│  Trigger: User requests --fix OR CRITICAL/HIGH issues detected      │
-│                                                                      │
-│  ┌────────────────────────────────────────────────────────┐         │
-│  │  Ralph Loop Integration:                               │         │
-│  │  1. Priority queue: CRITICAL → HIGH issues             │         │
-│  │  2. Fix iteration with verification                    │         │
-│  │  3. Run tests after each fix                           │         │
-│  │  4. Re-scan to confirm resolution                      │         │
-│  │  5. Progress reporting (X/Y issues resolved)           │         │
-│  │  6. Exit when: all fixed OR max iterations reached     │         │
-│  └────────────────────────────────────────────────────────┘         │
-└─────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│  OUTPUT: Review Report + Fix Summary (if applicable)                │
-└─────────────────────────────────────────────────────────────────────┘
+        <div class="architecture" style="text-align: center; padding: 20px;">
+            <img src="diagrams/svg/architecture-full.svg"
+                 alt="Complete 4-phase architecture: Pre-review validation, Parallel specialist review with 6 agents, Aggregation and prioritization, Fix cycle"
+                 role="img"
+                 style="max-width: 100%; height: auto;">
         </div>
     </section>
 

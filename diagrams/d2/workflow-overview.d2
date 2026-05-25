@@ -1,0 +1,64 @@
+# Omnibus Review Workflow Overview
+# 4-phase vertical flow diagram
+
+direction: down
+
+title: OMNIBUS REVIEW WORKFLOW {
+  style.fill: "#f8f9fa"
+  style.stroke: "#dee2e6"
+  style.font-size: 18
+  style.bold: true
+}
+
+phase1: Phase 1: SCOPE {
+  style.fill: "#0d6efd"
+  style.font-color: white
+  style.border-radius: 8
+}
+phase1_desc: "Determine files to review\n(git diff or explicit paths)" {
+  style.fill: transparent
+  style.stroke: transparent
+  style.font-size: 12
+}
+
+phase2: Phase 2: DISPATCH {
+  style.fill: "#0d6efd"
+  style.font-color: white
+  style.border-radius: 8
+}
+phase2_desc: "Launch 6 agents in parallel\n(all use Opus + ultrathink)" {
+  style.fill: transparent
+  style.stroke: transparent
+  style.font-size: 12
+}
+
+phase3: Phase 3: AGGREGATE {
+  style.fill: "#0d6efd"
+  style.font-color: white
+  style.border-radius: 8
+}
+phase3_desc: "Merge findings, filter <80 confidence\nDeduplicate, sort by severity" {
+  style.fill: transparent
+  style.stroke: transparent
+  style.font-size: 12
+}
+
+phase4: Phase 4: REPORT/FIX {
+  style.fill: "#198754"
+  style.font-color: white
+  style.border-radius: 8
+}
+phase4_desc: "Output report OR enter Ralph Loop\nFix CRITICAL→HIGH until resolved" {
+  style.fill: transparent
+  style.stroke: transparent
+  style.font-size: 12
+}
+
+title -> phase1
+phase1 -> phase1_desc: {style.stroke-dash: 3}
+phase1 -> phase2
+phase2 -> phase2_desc: {style.stroke-dash: 3}
+phase2 -> phase3
+phase3 -> phase3_desc: {style.stroke-dash: 3}
+phase3 -> phase4
+phase4 -> phase4_desc: {style.stroke-dash: 3}

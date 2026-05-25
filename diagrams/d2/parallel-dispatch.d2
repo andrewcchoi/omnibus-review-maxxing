@@ -1,0 +1,64 @@
+# Parallel Agent Dispatch
+# 6 agents running concurrently during Phase 2
+
+direction: down
+
+title: PARALLEL AGENT DISPATCH {
+  style.fill: "#f8f9fa"
+  style.stroke: "#dee2e6"
+  style.font-size: 16
+  style.bold: true
+}
+
+context: Context Package {
+  style.fill: "#f8f9fa"
+  style.stroke: "#dee2e6"
+  items: |md
+    - Staged diff
+    - Related files
+    - Project context
+    - Documentation
+  |
+}
+
+agents: {
+  label: "6 Agents (Parallel)"
+  style.fill: "#f8f9fa"
+  style.stroke: "#0d6efd"
+  style.stroke-width: 2
+
+  security: Security\nAnalyst {
+    style.fill: "#dc3545"
+    style.font-color: white
+  }
+  architecture: Architecture\nReviewer {
+    style.fill: "#0d6efd"
+    style.font-color: white
+  }
+  correctness: Correctness\nVerifier {
+    style.fill: "#dc3545"
+    style.font-color: white
+  }
+  performance: Performance\nAuditor {
+    style.fill: "#fd7e14"
+    style.font-color: white
+  }
+  test: Test\nEvaluator {
+    style.fill: "#198754"
+    style.font-color: white
+  }
+  style_check: Code\nStyle {
+    style.fill: "#0d6efd"
+    style.font-color: white
+  }
+}
+
+collect: Collect Results {
+  style.fill: "#198754"
+  style.font-color: white
+  style.border-radius: 8
+}
+
+title -> context
+context -> agents
+agents -> collect: JSON Reports

@@ -1,0 +1,153 @@
+# Full Architecture Diagram
+# Complete 4-phase workflow with all components
+
+direction: down
+
+user: USER INVOKES {
+  style.fill: "#f8f9fa"
+  style.stroke: "#dee2e6"
+  style.bold: true
+  label: "USER INVOKES\n/omnibus-review [OPTIONS]"
+}
+
+# Phase 1
+phase1: "PHASE 1: PRE-REVIEW VALIDATION & CONTEXT GATHERING" {
+  style.fill: "#e7f1ff"
+  style.stroke: "#0d6efd"
+  style.stroke-width: 2
+  style.border-radius: 8
+
+  git: Git Status\nValidation {
+    style.fill: "#0d6efd"
+    style.font-color: white
+  }
+  docs: Read Docs\nCLAUDE.md\nREADME.md {
+    style.fill: "#0d6efd"
+    style.font-color: white
+  }
+  analyze: Analyze\nProject\nStructure {
+    style.fill: "#0d6efd"
+    style.font-color: white
+  }
+}
+
+staged_check: Staged changes? {
+  shape: diamond
+  style.fill: "#ffc107"
+  style.font-color: "#212529"
+}
+
+error_exit: ERROR EXIT {
+  style.fill: "#dc3545"
+  style.font-color: white
+  style.border-radius: 8
+}
+
+build_context: Build Context\nfor Agents {
+  style.fill: "#198754"
+  style.font-color: white
+  style.border-radius: 8
+}
+
+# Phase 2
+phase2: "PHASE 2: PARALLEL SPECIALIST REVIEW (6 AGENTS)" {
+  style.fill: "#e7f1ff"
+  style.stroke: "#0d6efd"
+  style.stroke-width: 2
+  style.border-radius: 8
+
+  security: Security {
+    style.fill: "#dc3545"
+    style.font-color: white
+  }
+  arch: Architecture {
+    style.fill: "#0d6efd"
+    style.font-color: white
+  }
+  correct: Correctness {
+    style.fill: "#dc3545"
+    style.font-color: white
+  }
+  perf: Performance {
+    style.fill: "#fd7e14"
+    style.font-color: white
+  }
+  test: Test {
+    style.fill: "#198754"
+    style.font-color: white
+  }
+  code_style: Style {
+    style.fill: "#0d6efd"
+    style.font-color: white
+  }
+}
+
+# Phase 3
+phase3: "PHASE 3: AGGREGATION & PRIORITIZATION" {
+  style.fill: "#e7f1ff"
+  style.stroke: "#0d6efd"
+  style.stroke-width: 2
+  style.border-radius: 8
+
+  dedup: Deduplication {
+    style.fill: "#0d6efd"
+    style.font-color: white
+  }
+  severity: Severity\nAssignment {
+    style.fill: "#0d6efd"
+    style.font-color: white
+  }
+  group: Grouping\nRelated Issues {
+    style.fill: "#0d6efd"
+    style.font-color: white
+  }
+}
+
+filter: Filter by Confidence\nThreshold (>0.7) {
+  style.fill: "#ffc107"
+  style.font-color: "#212529"
+  style.border-radius: 8
+}
+
+report: Generate Consolidated\nReview Report {
+  style.fill: "#0d6efd"
+  style.font-color: white
+  style.border-radius: 8
+}
+
+# Decision
+fix_decision: Auto-fix? {
+  shape: diamond
+  style.fill: "#ffc107"
+  style.font-color: "#212529"
+}
+
+# Phase 4
+phase4: "PHASE 4: FIX CYCLE" {
+  style.fill: "#fff3cd"
+  style.stroke: "#fd7e14"
+  style.stroke-width: 2
+  style.border-radius: 8
+}
+
+present: Present Report\nEXIT SUCCESS {
+  style.fill: "#198754"
+  style.font-color: white
+  style.border-radius: 8
+}
+
+# Connections
+user -> phase1
+phase1 -> staged_check
+
+staged_check -> error_exit: NO
+staged_check -> build_context: YES
+
+build_context -> phase2
+phase2 -> phase3
+phase3 -> filter
+filter -> report
+report -> fix_decision
+
+fix_decision -> phase4: YES
+fix_decision -> present: NO

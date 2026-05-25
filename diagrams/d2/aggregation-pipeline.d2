@@ -1,0 +1,72 @@
+# Aggregation & Prioritization Pipeline
+# Phase 3: Processing agent findings
+
+direction: down
+
+input: "INPUT: 6 Agent Reports (JSON)" {
+  style.fill: "#f8f9fa"
+  style.stroke: "#dee2e6"
+}
+
+step1: Step 1: Deduplication {
+  style.fill: "#0d6efd"
+  style.font-color: white
+  style.border-radius: 8
+
+  items: |md
+    - Hash each finding: (file, line, category)
+    - Group identical findings
+    - Retain highest confidence version
+    - Track which agents agreed
+  |
+}
+
+step2: Step 2: Severity Assignment {
+  style.fill: "#0d6efd"
+  style.font-color: white
+  style.border-radius: 8
+
+  items: |md
+    - Apply severity matrix
+    - Consider impact + exploitability
+    - Upgrade if multiple agents agree
+    - Factor in project context
+  |
+}
+
+step3: Step 3: Grouping {
+  style.fill: "#0d6efd"
+  style.font-color: white
+  style.border-radius: 8
+
+  items: |md
+    - Cluster by root cause
+    - Link dependent issues
+    - Create issue families
+    - Suggest batch fixes
+  |
+}
+
+step4: Step 4: Confidence Filtering {
+  style.fill: "#ffc107"
+  style.font-color: "#212529"
+  style.border-radius: 8
+
+  items: |md
+    - Remove findings below 0.7
+    - Retain if multiple agents agree
+    - Flag uncertain for human review
+  |
+}
+
+output: "OUTPUT: Consolidated Review Report" {
+  style.fill: "#198754"
+  style.font-color: white
+  style.border-radius: 8
+}
+
+input -> step1
+step1 -> step2
+step2 -> step3
+step3 -> step4
+step4 -> output

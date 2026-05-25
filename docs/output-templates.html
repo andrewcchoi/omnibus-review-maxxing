@@ -71,6 +71,8 @@
             overflow-x: auto;
             margin: 20px 0;
             border: 2px solid var(--border);
+            white-space: pre;
+            overflow-wrap: normal;
         }
 
         .template-title {
@@ -129,6 +131,91 @@
         .section-divider {
             border-top: 2px dashed var(--border);
             margin: 30px 0;
+        }
+
+        /* Styled components for output examples */
+        .severity-grid {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .severity-stat {
+            padding: 15px 20px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .severity-stat.critical { background: var(--critical); color: white; }
+        .severity-stat.high { background: var(--high); color: white; }
+        .severity-stat.medium { background: var(--medium); color: var(--text); }
+        .severity-stat.low { background: var(--low); color: white; }
+
+        .severity-count {
+            display: block;
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .severity-label {
+            display: block;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+
+        .issue-card {
+            background: white;
+            border-radius: 8px;
+            margin: 15px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .issue-card.critical { border-left: 4px solid var(--critical); }
+        .issue-card.high { border-left: 4px solid var(--high); }
+        .issue-card.medium { border-left: 4px solid var(--medium); }
+        .issue-card.low { border-left: 4px solid var(--low); }
+
+        .issue-header {
+            background: var(--background);
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .issue-id {
+            font-weight: bold;
+            font-family: monospace;
+        }
+
+        .issue-title {
+            flex-grow: 1;
+            font-weight: 500;
+        }
+
+        .issue-body {
+            padding: 15px;
+        }
+
+        .issue-meta {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 5px 15px;
+            margin-bottom: 15px;
+        }
+
+        .issue-meta dt {
+            font-weight: 500;
+            color: #6c757d;
+        }
+
+        .issue-meta dd {
+            margin: 0;
         }
 
         @media print {
@@ -688,6 +775,69 @@ Recommendations:
 
 Partial report saved to: .omnibus-review/partial_report_[timestamp].json
 ============================================================
+        </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <section>
+        <h2>Styled Output Preview</h2>
+        <div class="description">
+            <p><strong>Note:</strong> The styled components below demonstrate how review findings could be rendered in interactive HTML reports generated with <code>--html</code> flag.</p>
+        </div>
+
+        <h3>Severity Summary</h3>
+        <div class="severity-grid">
+            <div class="severity-stat critical">
+                <span class="severity-count">2</span>
+                <span class="severity-label">Critical</span>
+            </div>
+            <div class="severity-stat high">
+                <span class="severity-count">5</span>
+                <span class="severity-label">High</span>
+            </div>
+            <div class="severity-stat medium">
+                <span class="severity-count">12</span>
+                <span class="severity-label">Medium</span>
+            </div>
+            <div class="severity-stat low">
+                <span class="severity-count">8</span>
+                <span class="severity-label">Low</span>
+            </div>
+        </div>
+
+        <h3>Issue Cards</h3>
+        <div class="issue-card critical">
+            <div class="issue-header">
+                <span class="issue-id">[C-1]</span>
+                <span class="issue-title">SQL Injection in Payment Query</span>
+                <span class="badge badge-critical">CRITICAL</span>
+            </div>
+            <div class="issue-body">
+                <dl class="issue-meta">
+                    <dt>Confidence</dt><dd>0.95</dd>
+                    <dt>Category</dt><dd>Security &gt; Injection</dd>
+                    <dt>CWE</dt><dd>CWE-89</dd>
+                    <dt>Location</dt><dd><code>backend/src/services/payment_service.py:156-158</code></dd>
+                </dl>
+                <p>User-controlled input directly interpolated into SQL query without parameterization.</p>
+            </div>
+        </div>
+
+        <div class="issue-card high">
+            <div class="issue-header">
+                <span class="issue-id">[H-1]</span>
+                <span class="issue-title">N+1 Query in Subscription Loader</span>
+                <span class="badge badge-high">HIGH</span>
+            </div>
+            <div class="issue-body">
+                <dl class="issue-meta">
+                    <dt>Confidence</dt><dd>0.88</dd>
+                    <dt>Category</dt><dd>Performance</dd>
+                    <dt>Location</dt><dd><code>backend/src/repositories/subscription_repo.py:45</code></dd>
+                </dl>
+                <p>Loading subscriptions in a loop causes N+1 database queries. Use eager loading instead.</p>
+            </div>
         </div>
     </section>
 
