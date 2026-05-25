@@ -107,3 +107,9 @@ Return findings as structured JSON:
 - Check for both positive and negative test cases
 - Look for brittle tests (hard-coded IDs, timestamp dependencies)
 - Ensure tests follow project testing patterns from CLAUDE.md
+
+## References
+Before reporting findings, consult these documents:
+- `docs/severity-guide.html` - Severity for test gaps (core functionality = CRITICAL, edge cases = MEDIUM)
+- `docs/output-templates.html` - JSON output format and field requirements
+- `references/checklist.html` - Test coverage checklist

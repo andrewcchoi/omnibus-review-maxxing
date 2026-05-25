@@ -87,3 +87,8 @@ Return findings as structured JSON:
 - Focus on explicit rules, not general best practices
 - Check both "DO" and "DO NOT" sections
 - Validate examples match documented patterns
+
+## References
+Before reporting findings, consult these documents:
+- `docs/severity-guide.html` - Severity for architecture violations vs style deviations
+- `docs/output-templates.html` - JSON output format and field requirements

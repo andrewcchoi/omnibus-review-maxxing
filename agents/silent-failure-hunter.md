@@ -107,3 +107,8 @@ Return findings as structured JSON:
 - Ensure user-facing operations provide feedback on failure
 - Background tasks must have error monitoring
 - Broad catches (Exception, BaseException) need strong justification
+
+## References
+Before reporting findings, consult these documents:
+- `docs/severity-guide.html` - Severity classification (data loss = CRITICAL, missing logs = HIGH)
+- `docs/output-templates.html` - JSON output format and field requirements

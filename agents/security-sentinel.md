@@ -91,3 +91,9 @@ Return findings as structured JSON:
 - Focus on exploitable issues, not theoretical risks
 - Consider the full context of security controls
 - Assume attackers have full knowledge of the code
+
+## References
+Before reporting findings, consult these documents:
+- `references/cwe-quick-ref.html` - CWE identification and OWASP mapping
+- `docs/severity-guide.html` - Severity assignment matrix (Impact × Exploitability)
+- `docs/output-templates.html` - JSON output format and field requirements

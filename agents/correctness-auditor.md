@@ -81,3 +81,9 @@ Return findings as structured JSON:
 - Consider both happy path and error paths
 - Think about concurrent execution scenarios
 - Validate assumptions about data flow
+
+## References
+Before reporting findings, consult these documents:
+- `docs/severity-guide.html` - Severity classification for logic errors vs edge cases
+- `docs/output-templates.html` - JSON output format and field requirements
+- `references/checklist.html` - Correctness patterns checklist

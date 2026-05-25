@@ -106,3 +106,9 @@ Return findings as structured JSON:
 - Respect existing codebase patterns and conventions
 - Prioritize changes that ease future modifications
 - Document positive patterns worth replicating
+
+## References
+Before reporting findings, consult these documents:
+- `docs/severity-guide.html` - Severity levels for architecture vs style issues
+- `docs/output-templates.html` - JSON output format and field requirements
+- `references/checklist.html` - Architecture and quality patterns
