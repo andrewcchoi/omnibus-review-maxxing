@@ -1,6 +1,6 @@
 ---
 description: "Comprehensive code review with iterative fixing"
-argument-hint: "[--fix] [--max-iterations N] [--opus] [files...]"
+argument-hint: "[--fix] [--html] [--max-iterations N] [--opus] [files...]"
 allowed-tools: ["Bash", "Read", "Write", "Edit", "Grep", "Glob", "Agent"]
 ---
 
@@ -19,6 +19,7 @@ cd /mnt/d/_wip/resumate-platform
 # Note: $ARGUMENTS is injected by Claude Code's command system
 # It contains the raw argument string passed to this command
 FIX_MODE=false
+HTML_MODE=false
 MAX_ITERATIONS=4
 USE_OPUS=false
 FILES=()
@@ -27,6 +28,9 @@ for arg in $ARGUMENTS; do
   case "$arg" in
     --fix)
       FIX_MODE=true
+      ;;
+    --html)
+      HTML_MODE=true
       ;;
     --max-iterations)
       # Next arg will be the number
@@ -275,7 +279,7 @@ Store the final aggregated findings in a structured format for Phase 4.
 
 ### Report Mode (default)
 
-If `FIX_MODE=false`, output a human-readable summary:
+If `FIX_MODE=false` and `HTML_MODE=false`, output a human-readable summary:
 
 ```
 === Omnibus Review Results ===
@@ -303,6 +307,229 @@ Breakdown by severity:
 
 ---
 Review complete. Run with --fix to automatically address these issues.
+```
+
+End with the exit phrase:
+```
+<promise>QUANTUM_EIGENSTATE_CRYSTALLIZED_OMEGA</promise>
+```
+
+### HTML Report Mode
+
+If `HTML_MODE=true`, generate a self-contained HTML report using the HTML effectiveness patterns.
+
+1. **Create output directory**: `mkdir -p .omnibus-review`
+
+2. **Generate timestamp**: `TIMESTAMP=$(date +%Y%m%d_%H%M%S)`
+
+3. **Write HTML file**: Use the Write tool to create `.omnibus-review/report_${TIMESTAMP}.html`
+
+The HTML file must be completely self-contained (all CSS inlined, no external dependencies). Use this template structure:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Code Review Report - ${TIMESTAMP}</title>
+  <style>
+    /* Base styles */
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f9fafb;
+      --text-primary: #111827;
+      --text-secondary: #6b7280;
+      --border-color: #e5e7eb;
+      --safe: #10b981;
+      --safe-bg: #d1fae5;
+      --safe-text: #065f46;
+      --medium: #f59e0b;
+      --medium-bg: #fef3c7;
+      --medium-text: #92400e;
+      --attention: #ef4444;
+      --attention-bg: #fee2e2;
+      --attention-text: #991b1b;
+      --primary: #2563eb;
+      --shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background: var(--bg-secondary);
+      margin: 0;
+      padding: 2rem;
+    }
+    .container { max-width: 1000px; margin: 0 auto; background: var(--bg-primary); padding: 2rem; border-radius: 0.5rem; box-shadow: var(--shadow); }
+    
+    /* Header */
+    .review-head { border-bottom: 3px solid var(--primary); padding-bottom: 1.5rem; margin-bottom: 2rem; }
+    .review-title { font-size: 1.75rem; font-weight: 700; margin: 0 0 0.5rem; }
+    .review-meta { display: flex; gap: 2rem; flex-wrap: wrap; font-size: 0.875rem; color: var(--text-secondary); }
+    .stat-box { display: flex; gap: 0.5rem; align-items: center; padding: 0.5rem 1rem; background: var(--bg-secondary); border-radius: 0.5rem; }
+    .stat-number { font-size: 1.5rem; font-weight: 700; }
+    .stat-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary); }
+    
+    /* Risk Map */
+    .risk-map { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 1rem; background: var(--bg-secondary); border-radius: 0.5rem; margin: 1.5rem 0; }
+    .risk-map-title { width: 100%; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.5rem; }
+    .chip { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.75rem; border-radius: 9999px; font-size: 0.8125rem; font-weight: 500; text-decoration: none; transition: transform 0.15s; }
+    .chip:hover { transform: translateY(-1px); }
+    .chip:focus { outline: 2px solid var(--primary); outline-offset: 2px; }
+    .chip.safe { background: var(--safe-bg); color: var(--safe-text); border: 1px solid var(--safe); }
+    .chip.safe::before { content: '✓'; }
+    .chip.medium { background: var(--medium-bg); color: var(--medium-text); border: 1px solid var(--medium); }
+    .chip.medium::before { content: '◉'; }
+    .chip.attention { background: var(--attention-bg); color: var(--attention-text); border: 1px solid var(--attention); }
+    .chip.attention::before { content: '⚠'; }
+    .risk-legend { display: flex; gap: 1rem; font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); width: 100%; }
+    
+    /* File Cards */
+    .file-card { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 0.5rem; margin: 1.5rem 0; overflow: hidden; box-shadow: var(--shadow); }
+    .file-card.highlighted { box-shadow: 0 0 0 3px var(--primary); }
+    .file-head { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); flex-wrap: wrap; }
+    .file-path { font-family: 'Monaco', 'Menlo', monospace; font-size: 0.875rem; font-weight: 600; }
+    .file-delta { font-family: monospace; font-size: 0.75rem; margin-left: auto; }
+    .file-delta .added { color: var(--safe); }
+    .file-delta .removed { color: var(--attention); }
+    .risk-tag { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.125rem 0.5rem; border-radius: 0.25rem; font-size: 0.6875rem; font-weight: 600; text-transform: uppercase; }
+    .risk-tag.safe { background: var(--safe-bg); color: var(--safe-text); }
+    .risk-tag.medium { background: var(--medium-bg); color: var(--medium-text); }
+    .risk-tag.attention { background: var(--attention-bg); color: var(--attention-text); }
+    
+    /* Comment Bubbles */
+    .comments { padding: 1rem; background: var(--bg-secondary); }
+    .bubble { background: var(--bg-primary); border-radius: 0.5rem; padding: 1rem; margin: 0.75rem 0; border-left: 4px solid var(--border-color); }
+    .bubble:first-child { margin-top: 0; }
+    .bubble .severity { display: inline-block; font-size: 0.6875rem; font-weight: 700; text-transform: uppercase; padding: 0.125rem 0.5rem; border-radius: 0.25rem; margin-bottom: 0.5rem; }
+    .bubble.critical { border-left-color: var(--attention); }
+    .bubble.critical .severity { background: var(--attention-bg); color: var(--attention-text); }
+    .bubble.high { border-left-color: #f97316; }
+    .bubble.high .severity { background: #ffedd5; color: #9a3412; }
+    .bubble.medium-sev { border-left-color: var(--medium); }
+    .bubble.medium-sev .severity { background: var(--medium-bg); color: var(--medium-text); }
+    .bubble.low { border-left-color: var(--primary); }
+    .bubble.low .severity { background: #dbeafe; color: #1e40af; }
+    .bubble p { margin: 0.5rem 0 0; font-size: 0.9375rem; }
+    .bubble code { background: var(--bg-secondary); padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.8125rem; }
+    .bubble .location { font-family: monospace; font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem; }
+    .bubble .agent { font-size: 0.6875rem; color: var(--text-secondary); margin-top: 0.5rem; }
+    
+    /* Next Steps */
+    .next-steps { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 1.5rem; margin: 2rem 0; }
+    .next-steps-title { font-size: 1rem; font-weight: 700; margin: 0 0 1rem; }
+    .next-steps-list { list-style: none; padding: 0; margin: 0; counter-reset: step; }
+    .next-steps-list li { display: flex; gap: 0.75rem; padding: 0.5rem 0; counter-increment: step; }
+    .next-steps-list li::before { content: counter(step); display: flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem; background: var(--primary); color: white; border-radius: 50%; font-size: 0.75rem; font-weight: 600; flex-shrink: 0; }
+    
+    /* Accessibility */
+    @media (prefers-reduced-motion: reduce) { .chip, .file-card.highlighted { transition: none; } }
+    @media print { body { background: white; padding: 0; } .container { box-shadow: none; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="review-head">
+      <h1 class="review-title">Code Review Report</h1>
+      <div class="review-meta">
+        <span>Generated: ${TIMESTAMP}</span>
+        <span>Files reviewed: ${FILE_COUNT}</span>
+      </div>
+      <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+        <div class="stat-box" style="border-left: 4px solid var(--attention);">
+          <div><div class="stat-number">${CRITICAL_COUNT}</div><div class="stat-label">Critical</div></div>
+        </div>
+        <div class="stat-box" style="border-left: 4px solid #f97316;">
+          <div><div class="stat-number">${HIGH_COUNT}</div><div class="stat-label">High</div></div>
+        </div>
+        <div class="stat-box" style="border-left: 4px solid var(--medium);">
+          <div><div class="stat-number">${MEDIUM_COUNT}</div><div class="stat-label">Medium</div></div>
+        </div>
+        <div class="stat-box" style="border-left: 4px solid var(--primary);">
+          <div><div class="stat-number">${LOW_COUNT}</div><div class="stat-label">Low</div></div>
+        </div>
+      </div>
+    </header>
+
+    <nav class="risk-map" role="navigation" aria-label="Files by severity">
+      <div class="risk-map-title">Jump to file</div>
+      <!-- For each file, generate a chip with appropriate severity class -->
+      <!-- <a href="#file-hash" class="chip attention">filename.py</a> -->
+      ${RISK_MAP_CHIPS}
+      <div class="risk-legend">
+        <span>✓ Safe</span>
+        <span>◉ Needs review</span>
+        <span>⚠ Attention required</span>
+      </div>
+    </nav>
+
+    <main>
+      <!-- For each file with findings, generate a file-card -->
+      ${FILE_CARDS}
+    </main>
+
+    <section class="next-steps">
+      <h2 class="next-steps-title">Suggested Next Steps</h2>
+      <ol class="next-steps-list">
+        <li>Address all critical issues first</li>
+        <li>Review high-priority findings</li>
+        <li>Run with <code>--fix</code> for automatic remediation</li>
+        <li>Re-run review to verify fixes</li>
+      </ol>
+    </section>
+  </div>
+  
+  <script>
+    // Highlight file card on navigation
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const target = document.querySelector(chip.getAttribute('href'));
+        if (target) {
+          target.classList.add('highlighted');
+          setTimeout(() => target.classList.remove('highlighted'), 1400);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+```
+
+**Generating the dynamic content**:
+
+1. **RISK_MAP_CHIPS**: For each file with findings, generate a chip:
+   - Determine the highest severity finding for that file (critical > high > medium > low)
+   - Map severity to chip class: critical/high → `attention`, medium → `medium`, low → `safe`
+   - Generate: `<a href="#file-${FILE_HASH}" class="chip ${SEVERITY_CLASS}">${FILENAME}</a>`
+   - FILE_HASH should be a URL-safe hash of the file path
+
+2. **FILE_CARDS**: For each file with findings, generate a file card:
+   ```html
+   <article class="file-card" id="file-${FILE_HASH}">
+     <header class="file-head">
+       <span class="file-path">${FILE_PATH}</span>
+       <span class="risk-tag ${SEVERITY_CLASS}">${HIGHEST_SEVERITY}</span>
+     </header>
+     <div class="comments">
+       <!-- For each finding in this file -->
+       <div class="bubble ${SEVERITY}">
+         <span class="severity">${SEVERITY}</span>
+         <strong>${TITLE}</strong>
+         <p>${DESCRIPTION}</p>
+         <div class="location">Lines ${LINE_START}-${LINE_END}</div>
+         <div class="agent">Found by: ${AGENT_NAME}</div>
+       </div>
+     </div>
+   </article>
+   ```
+
+4. **Report success**:
+```
+HTML report generated: .omnibus-review/report_${TIMESTAMP}.html
+
+Open in browser to view the interactive report.
 ```
 
 End with the exit phrase:

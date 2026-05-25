@@ -19,6 +19,9 @@ A comprehensive Claude Code review plugin combining 6 specialized agents with Ra
 # Review specific files
 /omnibus-review src/api/ src/models/
 
+# Generate interactive HTML report
+/omnibus-review --html
+
 # Review with iterative fixing (max 4 iterations)
 /omnibus-review --fix
 
@@ -120,9 +123,22 @@ Rich HTML documentation is included in the plugin:
 | Argument | Description | Default |
 |----------|-------------|---------|
 | `--fix` | Enable Ralph Loop iterative fixing | Off |
+| `--html` | Generate interactive HTML report with risk maps | Off |
 | `--max-iterations N` | Maximum fix iterations | 4 |
 | `--opus` | Use Opus for fixing (review always uses Opus) | Sonnet |
 | `[files...]` | Specific files/directories to review | git diff |
+
+## HTML Output
+
+With `--html`, the review generates a self-contained HTML report at `.omnibus-review/report_[timestamp].html`:
+
+- **Risk map** - Clickable severity chips for quick navigation to files
+- **File cards** - Each file with its findings grouped
+- **Severity indicators** - Color-blind accessible (icons + colors)
+- **Comment bubbles** - Findings with severity, description, location
+- **Next steps** - Actionable checklist
+
+Open the HTML file in any browser. No build step or dependencies required.
 
 ## Output Format
 
