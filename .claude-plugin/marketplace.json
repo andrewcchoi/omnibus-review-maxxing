@@ -1,0 +1,15 @@
+{
+  "name": "omnibus-review-maxxing",
+  "version": "1.0.0",
+  "description": "Personal marketplace for omnibus-review plugin",
+  "owner": {
+    "name": "choia"
+  },
+  "plugins": [
+    {
+      "name": "omnibus-review",
+      "source": "./",
+      "category": "code-review"
+    }
+  ]
+}
