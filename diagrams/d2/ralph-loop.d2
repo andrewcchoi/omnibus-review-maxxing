@@ -1,98 +1,178 @@
-# Ralph Loop Fix Cycle
-# Phase 4: Iterative fixing process
+# Ralph Loop Fix Cycle - Parallel Subagent Architecture
+# Phase 4: Iterative fixing with context isolation
 
 direction: down
 
-start: Initialize Fix Queue {
-  style.fill: "#0d6efd"
-  style.font-color: white
-  style.border-radius: 8
-  label: "Initialize Fix Queue\nCRITICAL first, then HIGH"
+# ========== PLANNING ==========
+planning: Planning Phase {
+  style.fill: "#dbeafe"
+  style.stroke: "#3b82f6"
+
+  group: Group findings by file {
+    style.fill: "#eff6ff"
+  }
+
+  plans: Generate fix plans {
+    style.fill: "#eff6ff"
+    label: "Generate YAML fix plans\n(one per file)"
+  }
+
+  group -> plans
 }
 
-counter: "Iteration Counter = 0" {
-  style.fill: "#f8f9fa"
-  style.stroke: "#dee2e6"
+# ========== PARALLEL FIXERS ==========
+fix_phase: Fix Phase (Parallel Subagents) {
+  style.fill: "#fce7f3"
+  style.stroke: "#ec4899"
+
+  dispatch_fix: Dispatch fixers {
+    shape: hexagon
+    style.fill: "#f9a8d4"
+    label: "Spawn parallel\nomnibus-fixer agents"
+  }
+
+  fixers: {
+    style.fill: "#fdf2f8"
+
+    fixer_a: "Fixer: file-A.py" {
+      shape: person
+      style.fill: "#f472b6"
+    }
+    fixer_b: "Fixer: file-B.py" {
+      shape: person
+      style.fill: "#f472b6"
+    }
+    fixer_c: "Fixer: file-C.py" {
+      shape: person
+      style.fill: "#f472b6"
+    }
+  }
+
+  collect_fix: Collect updated plans {
+    style.fill: "#fbcfe8"
+  }
+
+  dispatch_fix -> fixers.fixer_a
+  dispatch_fix -> fixers.fixer_b
+  dispatch_fix -> fixers.fixer_c
+  fixers.fixer_a -> collect_fix
+  fixers.fixer_b -> collect_fix
+  fixers.fixer_c -> collect_fix
 }
 
-check_more: More issues? {
+# ========== PARALLEL VALIDATORS ==========
+validate_phase: Validation Phase (Parallel Subagents) {
+  style.fill: "#d1fae5"
+  style.stroke: "#10b981"
+
+  dispatch_val: Dispatch validators {
+    shape: hexagon
+    style.fill: "#6ee7b7"
+    label: "Spawn parallel\nomnibus-validator agents"
+  }
+
+  validators: {
+    style.fill: "#ecfdf5"
+
+    val_a: "Validator: file-A.py" {
+      shape: person
+      style.fill: "#34d399"
+    }
+    val_b: "Validator: file-B.py" {
+      shape: person
+      style.fill: "#34d399"
+    }
+    val_c: "Validator: file-C.py" {
+      shape: person
+      style.fill: "#34d399"
+    }
+  }
+
+  collect_val: Collect validation reports {
+    style.fill: "#a7f3d0"
+  }
+
+  dispatch_val -> validators.val_a
+  dispatch_val -> validators.val_b
+  dispatch_val -> validators.val_c
+  validators.val_a -> collect_val
+  validators.val_b -> collect_val
+  validators.val_c -> collect_val
+}
+
+# ========== RE-REVIEW ==========
+rereview: Re-Review Phase {
+  style.fill: "#e0e7ff"
+  style.stroke: "#6366f1"
+
+  run: Run 6 review agents {
+    style.fill: "#c7d2fe"
+    label: "Run review agents\non modified files only"
+  }
+
+  findings: New findings {
+    shape: document
+    style.fill: "#a5b4fc"
+  }
+
+  run -> findings
+}
+
+# ========== DECISION ==========
+decision: CRITICAL/HIGH remain? {
   shape: diamond
-  style.fill: "#ffc107"
-  style.font-color: "#212529"
+  style.fill: "#fef3c7"
+  style.stroke: "#f59e0b"
 }
 
-check_max: Max iterations? {
+max_check: Max iterations? {
   shape: diamond
-  style.fill: "#ffc107"
-  style.font-color: "#212529"
+  style.fill: "#fee2e2"
+  style.stroke: "#ef4444"
 }
 
-pop: Pop next issue {
-  style.fill: "#f8f9fa"
-  style.stroke: "#dee2e6"
-  label: "Pop next issue\nfrom priority queue"
+# ========== OUTCOMES ==========
+success: Done - All resolved {
+  shape: oval
+  style.fill: "#d1fae5"
+  style.stroke: "#10b981"
+  style.stroke-width: 3
 }
 
-fix: Apply Fix {
-  style.fill: "#0d6efd"
-  style.font-color: white
-  style.border-radius: 8
-  label: "Apply automated fix\n- Edit files\n- Run formatters\n- Stage changes"
+max_exit: Done - Max iterations {
+  shape: oval
+  style.fill: "#fee2e2"
+  style.stroke: "#ef4444"
+  style.stroke-width: 2
+  label: "Done - Max iterations\nManual review needed"
 }
 
-test: Run Tests {
-  style.fill: "#f8f9fa"
-  style.stroke: "#dee2e6"
+# ========== CONNECTIONS ==========
+planning -> fix_phase
+fix_phase -> validate_phase
+validate_phase -> rereview
+rereview -> decision
+
+decision -> success: No
+decision -> max_check: Yes
+
+max_check -> max_exit: Yes
+max_check -> planning: No {
+  style.stroke: "#ef4444"
+  style.stroke-width: 3
+  label: "Loop with\nnew findings"
 }
 
-pass: Mark Fixed {
-  style.fill: "#198754"
-  style.font-color: white
-  style.border-radius: 8
-  label: "Mark fixed\nRemove from queue"
+# ========== LEGEND ==========
+legend: {
+  style.fill: "#f3f4f6"
+  near: bottom-right
+
+  label: |md
+    **Context Isolation**
+    Each subagent starts fresh:
+    - Fixer: file + plan only
+    - Validator: plan + diff only
+    - No compaction needed
+  |
 }
-
-fail: Rollback {
-  style.fill: "#dc3545"
-  style.font-color: white
-  style.border-radius: 8
-  label: "Rollback fix\nMark as failed"
-}
-
-increment: Increment iteration {
-  style.fill: "#f8f9fa"
-  style.stroke: "#dee2e6"
-}
-
-rerun: Re-run Review {
-  style.fill: "#0d6efd"
-  style.font-color: white
-  style.border-radius: 8
-  label: "Re-run Full Review\nVerify fixes worked"
-}
-
-summary: Generate Summary {
-  style.fill: "#198754"
-  style.font-color: white
-  style.border-radius: 8
-  label: "Generate Fix Summary\n- Issues resolved\n- Issues failed\n- Iterations used"
-}
-
-start -> counter
-counter -> check_more
-
-check_more -> pop: YES
-check_more -> check_max: NO
-
-check_max -> summary: YES
-check_max -> pop: NO
-
-pop -> fix
-fix -> test
-test -> pass: PASS
-test -> fail: FAIL
-pass -> increment
-fail -> increment
-increment -> check_more
-
-summary -> rerun

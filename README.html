@@ -253,8 +253,9 @@
     <section>
         <h2>Overview</h2>
         <p>
-            Omnibus Review is a sophisticated multi-agent code review system that orchestrates six specialized
-            AI agents to perform deep, comprehensive analysis of codebases. Unlike traditional review tools,
+            Omnibus Review is a sophisticated multi-agent code review system that orchestrates eight specialized
+            AI agents to perform deep, comprehensive analysis of codebases. Six review agents analyze code in parallel,
+            while two fix agents handle automated remediation with validation. Unlike traditional review tools,
             it employs parallel specialist agents working independently with advanced reasoning capabilities
             to catch issues that single-pass reviews miss.
         </p>
@@ -262,19 +263,19 @@
         <div class="feature-grid">
             <div class="feature-card">
                 <h3>Multi-Agent Architecture</h3>
-                <p>Six specialized agents working in parallel, each focusing on their domain expertise to maximize coverage and depth.</p>
+                <p>Eight specialized agents: six for review (parallel), two for fixing (fixer + validator per file).</p>
             </div>
             <div class="feature-card">
                 <h3>Advanced Reasoning</h3>
                 <p>All agents use Claude Opus 4.5 with ultrathink extended thinking for deeper analysis and fewer false positives.</p>
             </div>
             <div class="feature-card">
-                <h3>Automated Fix Cycles</h3>
-                <p>Ralph Loop integration automatically fixes critical and high severity issues with iterative refinement.</p>
+                <h3>Parallel Fix with Validation</h3>
+                <p>Parallel fixer subagents per file, each validated independently. Complete fixes only - no shortcuts.</p>
             </div>
             <div class="feature-card">
-                <h3>Intelligent Aggregation</h3>
-                <p>Deduplicates findings across agents, groups related issues, and produces actionable consolidated reports.</p>
+                <h3>Context Isolation</h3>
+                <p>Fix agents start fresh with minimal context (file + plan only). No compaction needed during fix loops.</p>
             </div>
         </div>
     </section>
@@ -401,6 +402,7 @@
     <section>
         <h2>Specialist Agents</h2>
 
+        <h3>Review Agents (6)</h3>
         <table>
             <thead>
                 <tr>
@@ -443,6 +445,29 @@
             </tbody>
         </table>
 
+        <h3>Fix Agents (2)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Agent</th>
+                    <th>Purpose</th>
+                    <th>Key Behaviors</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Omnibus Fixer</strong></td>
+                    <td>Applies COMPLETE fixes to single file following fix plan</td>
+                    <td>No shortcuts, architecture alignment, divergence documentation</td>
+                </tr>
+                <tr>
+                    <td><strong>Omnibus Validator</strong></td>
+                    <td>Verifies fixes match plan, catches shortcuts and regressions</td>
+                    <td>Completeness check, architecture compliance, new issue detection</td>
+                </tr>
+            </tbody>
+        </table>
+
         <p>
             See <a href="docs/agent-overview.html">Agent Overview</a> for detailed responsibilities and examples.
         </p>
@@ -476,25 +501,46 @@
     </section>
 
     <section>
-        <h2>Ralph Loop Integration</h2>
+        <h2>Parallel Fix Architecture</h2>
 
         <p>
-            When <code>--fix</code> is enabled or CRITICAL/HIGH issues are detected, omnibus-review
-            automatically initiates a Ralph Loop fix cycle:
+            When <code>--fix</code> is enabled, omnibus-review uses a parallel subagent architecture
+            for context isolation and scalability:
         </p>
 
+        <h3>Fix Workflow</h3>
         <ol>
-            <li><strong>Prioritization:</strong> Issues sorted by severity (CRITICAL first, then HIGH)</li>
-            <li><strong>Iterative Fixes:</strong> Each issue fixed one at a time with verification</li>
-            <li><strong>Test Execution:</strong> Full test suite runs after each fix to catch regressions</li>
-            <li><strong>Re-scanning:</strong> After fix attempts, re-run review to confirm resolution</li>
-            <li><strong>Progress Tracking:</strong> Live updates showing X/Y issues resolved</li>
-            <li><strong>Exit Conditions:</strong> All issues fixed OR max iterations reached OR tests fail</li>
+            <li><strong>Planning:</strong> Group findings by file, generate YAML fix plan per file</li>
+            <li><strong>Parallel Fixers:</strong> Spawn one <code>omnibus-fixer</code> subagent per file (all run in parallel)</li>
+            <li><strong>Parallel Validators:</strong> Spawn one <code>omnibus-validator</code> subagent per fixed file (all run in parallel)</li>
+            <li><strong>Re-Review:</strong> Run 6 review agents on modified files only</li>
+            <li><strong>Iteration:</strong> If CRITICAL/HIGH remain, loop back to Planning</li>
+            <li><strong>Exit:</strong> All issues fixed OR max iterations reached</li>
         </ol>
 
+        <h3>Key Principles</h3>
+        <ul>
+            <li><strong>No confirmation prompts:</strong> <code>--fix</code> proceeds automatically</li>
+            <li><strong>Complete fixes only:</strong> No shortcuts - address root cause, not symptoms</li>
+            <li><strong>Architecture alignment:</strong> Fixes must fit existing codebase patterns</li>
+            <li><strong>Divergence tracking:</strong> Any deviation from plan requires documented reason</li>
+            <li><strong>Validation layer:</strong> Validators catch incomplete fixes before re-review</li>
+        </ul>
+
+        <h3>Context Isolation Benefit</h3>
+        <p>
+            Each fixer/validator subagent starts with <strong>fresh context</strong> containing only:
+        </p>
+        <ul>
+            <li>Fixer: Single file + YAML fix plan + architecture context</li>
+            <li>Validator: Fix plan + git diff for that file</li>
+        </ul>
+        <p>
+            This eliminates context bloat during fix loops - no compaction needed regardless of file count.
+        </p>
+
         <div class="info">
-            <strong>Ralph Loop</strong> is Claude Code's agentic iteration system that can autonomously
-            work on a task list until completion or intervention is needed.
+            <strong>Diagram:</strong> See <a href="docs/omnibus-workflow.svg">omnibus-workflow.svg</a> for the complete visual workflow.
         </div>
     </section>
 

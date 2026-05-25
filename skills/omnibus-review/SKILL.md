@@ -67,44 +67,71 @@ Trigger this skill when the user requests:
 
 ## How It Works
 
-The omnibus review executes in 4 phases:
+The omnibus review executes in phases:
 
+### Review Mode (default)
 1. **Dispatch Phase**: Spawns 6 parallel review agents, each running Opus 4.5 with ultrathink mode
 2. **Aggregation Phase**: Collects and consolidates findings into structured JSON
 3. **Formatting Phase**: Transforms aggregated data into human-readable report with severity-based grouping
-4. **Fix Phase** (optional): Enters Ralph Loop to iteratively address findings until confidence threshold (80) is reached or max iterations (default 4) exhausted
 
-## The 6 Review Agents
+### Fix Mode (`--fix` flag)
+4. **Planning Phase**: Groups findings by file, generates YAML fix plans
+5. **Fix Phase**: Spawns parallel `omnibus-fixer` subagents (one per file)
+6. **Validation Phase**: Spawns parallel `omnibus-validator` subagents (verify fixes)
+7. **Re-Review Phase**: Runs review agents on modified files, loops if issues remain
 
+## The 8 Agents
+
+### Review Agents (6)
 Each agent focuses on a specific quality dimension:
 
 1. **Correctness Agent**: Logic errors, race conditions, data consistency, algorithmic correctness
 2. **Security Agent**: Vulnerabilities (OWASP Top 10), injection flaws, auth/authz issues, crypto misuse
-3. **Compliance Agent**: Legal requirements (GDPR, CCPA, HIPAA), accessibility (WCAG), industry standards
+3. **Compliance Agent**: CLAUDE.md guidelines, architecture patterns, coding standards
 4. **Testing Agent**: Test coverage gaps, missing edge cases, test quality, fixture issues
 5. **Error Handling Agent**: Exception handling, error propagation, logging, graceful degradation
 6. **Quality Agent**: Code style, maintainability, documentation, performance, best practices
 
-All agents use:
+### Fix Agents (2)
+7. **Omnibus Fixer**: Applies COMPLETE fixes per file following fix plan, documents divergence
+8. **Omnibus Validator**: Verifies fixes match plan, catches shortcuts, flags regressions
+
+All review agents use:
 - **Model**: Claude Opus 4.5
 - **Mode**: Ultrathink (extended reasoning)
 - **Output**: Structured JSON findings with severity (critical/high/medium/low), confidence (0-100), file paths, and remediation
 
-## Ralph Loop Integration
+Fix agents use:
+- **Model**: Claude Opus 4.5
+- **Context**: Fresh (isolated from review phase)
+- **Input**: Single file + YAML fix plan
+- **Output**: Updated plan with status and validation report
+
+## Parallel Fix Architecture
 
 When `--fix` is enabled:
 
-1. After receiving aggregated findings, automatically invokes Ralph Loop
-2. Ralph iteratively addresses findings, prioritizing by severity
-3. After each iteration, re-runs omnibus review to measure progress
-4. Exits when confidence >= 80 or max iterations reached
-5. Early exit phrase: `QUANTUM_EIGENSTATE_CRYSTALLIZED_OMEGA`
+1. **No confirmation prompts** - proceeds automatically with all fixes
+2. **Complete fixes only** - no shortcuts, must address root cause
+3. **Architecture alignment** - fixes must fit existing codebase patterns
+4. **Context isolation** - each fixer/validator starts fresh (no compaction)
+5. **Divergence tracking** - deviations require documented reasons
+6. **Validation layer** - validators catch incomplete or incorrect fixes
 
-Ralph Loop provides:
-- Automatic prioritization of critical/high severity issues
-- Progress tracking across iterations
-- Confidence scoring to measure improvement
-- Graceful exit conditions
+```
+Findings → Group by file → 
+    Parallel Fixers (one per file) →
+    Parallel Validators (one per file) →
+    Re-Review → Loop if CRITICAL/HIGH remain
+```
+
+Early exit phrase: `QUANTUM_EIGENSTATE_CRYSTALLIZED_OMEGA`
+
+Benefits:
+- Scales to any number of files
+- No context bloat during fix loop
+- Each agent has minimal, focused context
+- Validation catches mistakes before re-review
 
 ## Output Format
 

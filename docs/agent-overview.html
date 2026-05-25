@@ -224,12 +224,14 @@
     <a href="../README.html" class="nav-link">← Back to README</a>
 
     <section>
-        <h2>The Six Specialist Agents</h2>
+        <h2>The Eight Specialist Agents</h2>
         <p>
-            Omnibus Review employs six specialized AI agents, each powered by Claude Opus 4.5 with
-            ultrathink extended thinking. Each agent operates independently, focusing on their domain
-            expertise to provide comprehensive coverage without overlap or groupthink.
+            Omnibus Review employs eight specialized AI agents. Six <strong>review agents</strong> analyze code
+            in parallel, each powered by Claude Opus 4.5 with ultrathink extended thinking. Two <strong>fix agents</strong>
+            handle the iterative fixing process with context isolation.
         </p>
+
+        <h3>Review Agents (6)</h3>
 
         <div class="agent-grid">
             <div class="agent-card agent-security">
@@ -368,6 +370,73 @@
                     <li>Readability improvements</li>
                 </ul>
                 <p><strong>Expertise:</strong> Style guides, clean code principles, documentation standards</p>
+            </div>
+        </div>
+
+        <h3 style="margin-top: 40px;">Fix Agents (2)</h3>
+        <p>
+            These agents run during <code>--fix</code> mode as parallel subagents. Each starts with fresh context
+            (no inheritance from review phase) to prevent context bloat and eliminate compaction.
+        </p>
+
+        <div class="agent-grid">
+            <div class="agent-card" style="border-color: #9b59b6;">
+                <div class="agent-header">
+                    <div class="agent-icon" style="background: #9b59b6;">🔧</div>
+                    <div>
+                        <h3>Omnibus Fixer</h3>
+                        <div class="model-badge">Claude Opus 4.5</div>
+                    </div>
+                </div>
+                <p><strong>Mission:</strong> Apply COMPLETE fixes to a single file following a structured fix plan</p>
+                <p><strong>Focus Areas:</strong></p>
+                <ul>
+                    <li>Root cause fixes (not symptoms)</li>
+                    <li>Architecture alignment</li>
+                    <li>Pattern consistency with codebase</li>
+                    <li>Edge case handling</li>
+                    <li>Type safety preservation</li>
+                    <li>Divergence documentation</li>
+                </ul>
+                <p><strong>Key Principles:</strong></p>
+                <ul>
+                    <li>No shortcuts or quick fixes</li>
+                    <li>Must fit existing architecture</li>
+                    <li>Updates fix plan with status</li>
+                    <li>Documents reasons for divergence</li>
+                </ul>
+                <p><strong>Input:</strong> Single file + YAML fix plan</p>
+                <p><strong>Output:</strong> Updated fix plan with actual_fix and status per finding</p>
+            </div>
+
+            <div class="agent-card" style="border-color: #27ae60;">
+                <div class="agent-header">
+                    <div class="agent-icon" style="background: #27ae60;">✓</div>
+                    <div>
+                        <h3>Omnibus Validator</h3>
+                        <div class="model-badge">Claude Opus 4.5</div>
+                    </div>
+                </div>
+                <p><strong>Mission:</strong> Verify fixes are complete, correct, and match the fix plan</p>
+                <p><strong>Focus Areas:</strong></p>
+                <ul>
+                    <li>Fix application verification</li>
+                    <li>Completeness assessment</li>
+                    <li>Architecture compliance</li>
+                    <li>Divergence evaluation</li>
+                    <li>Regression detection</li>
+                    <li>New issue identification</li>
+                </ul>
+                <p><strong>Catches:</strong></p>
+                <ul>
+                    <li>Incomplete fixes (shortcuts)</li>
+                    <li>Fixes not matching plan</li>
+                    <li>Invalid divergence reasons</li>
+                    <li>Regressions introduced</li>
+                    <li>Architecture violations</li>
+                </ul>
+                <p><strong>Input:</strong> Updated fix plan + git diff</p>
+                <p><strong>Output:</strong> Validation report (pass/fail per finding)</p>
             </div>
         </div>
     </section>

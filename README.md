@@ -29,7 +29,9 @@ A comprehensive Claude Code review plugin combining 6 specialized agents with Ra
 /omnibus-review --fix --opus
 ```
 
-## The 6 Agents
+## The 8 Agents
+
+### Review Agents (6)
 
 | Agent | Focus | Color |
 |-------|-------|-------|
@@ -39,6 +41,13 @@ A comprehensive Claude Code review plugin combining 6 specialized agents with Ra
 | **test-coverage-analyzer** | Test gaps, missing edge cases, weak assertions | 🟢 Green |
 | **silent-failure-hunter** | Empty catches, swallowed errors, missing logging | 🟡 Yellow |
 | **code-quality-reviewer** | Duplication, complexity, naming, patterns | 🔵 Blue |
+
+### Fix Agents (2)
+
+| Agent | Focus | Color |
+|-------|-------|-------|
+| **omnibus-fixer** | Applies COMPLETE fixes per file, updates fix plans | 🟣 Purple |
+| **omnibus-validator** | Validates fixes match plan, catches shortcuts | 🟢 Green |
 
 ## Workflow
 
@@ -53,16 +62,43 @@ A comprehensive Claude Code review plugin combining 6 specialized agents with Ra
 | **MEDIUM** | 🟡 `#ffc107` | Confidence ≥80 | Consider fixing |
 | **LOW** | 🔵 `#0d6efd` | Confidence ≥80 | Nice to have |
 
-## Ralph Loop Integration
+## Fix Mode Architecture
 
-When `--fix` is enabled, the review enters an iterative loop:
+When `--fix` is enabled, the review uses a parallel subagent architecture for context isolation:
+
+```
+Review (6 agents) → Aggregate → Group by file →
+    ┌─ omnibus-fixer (file A) ─┐
+    ├─ omnibus-fixer (file B) ─┼→ Updated fix plans
+    └─ omnibus-fixer (file C) ─┘
+              ↓
+    ┌─ omnibus-validator (file A) ─┐
+    ├─ omnibus-validator (file B) ─┼→ Validation reports  
+    └─ omnibus-validator (file C) ─┘
+              ↓
+    Re-review → Loop if CRITICAL/HIGH remain
+```
+
+### Key Principles
+
+- **No confirmation prompts** - `--fix` proceeds automatically
+- **Complete fixes only** - No shortcuts, address root cause
+- **Architecture alignment** - Fixes must fit existing patterns
+- **Divergence tracking** - Deviations require documented reasons
+- **Context isolation** - Each subagent starts fresh (no compaction)
+
+### Iteration Loop
 
 1. Run comprehensive review (6 agents)
-2. Fix CRITICAL issues first, then HIGH
-3. Re-run review to verify fixes
-4. Repeat until no CRITICAL/HIGH issues remain OR max iterations (default: 4)
+2. Generate fix plans per file
+3. Dispatch parallel fixer subagents (one per file)
+4. Dispatch parallel validator subagents (verify fixes)
+5. Re-run review on modified files
+6. Repeat until no CRITICAL/HIGH issues remain OR max iterations (default: 4)
 
 **Early Exit Phrase:** `QUANTUM_EIGENSTATE_CRYSTALLIZED_OMEGA`
+
+See [docs/omnibus-workflow.svg](docs/omnibus-workflow.svg) for the complete visual workflow.
 
 ## Installation
 

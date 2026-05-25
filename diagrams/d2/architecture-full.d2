@@ -122,12 +122,41 @@ fix_decision: Auto-fix? {
   style.font-color: "#212529"
 }
 
-# Phase 4
-phase4: "PHASE 4: FIX CYCLE" {
-  style.fill: "#fff3cd"
-  style.stroke: "#fd7e14"
+# Phase 4 - Expanded
+phase4: "PHASE 4: PARALLEL FIX CYCLE" {
+  style.fill: "#fce7f3"
+  style.stroke: "#ec4899"
   style.stroke-width: 2
   style.border-radius: 8
+
+  planning: Planning {
+    style.fill: "#dbeafe"
+    label: "Group by file\nGenerate fix plans"
+  }
+
+  fixers: Parallel Fixers {
+    style.fill: "#f9a8d4"
+    label: "omnibus-fixer\n(one per file)"
+  }
+
+  validators: Parallel Validators {
+    style.fill: "#6ee7b7"
+    label: "omnibus-validator\n(one per file)"
+  }
+
+  rereview: Re-Review {
+    style.fill: "#c7d2fe"
+    label: "Run 6 agents\non modified files"
+  }
+
+  planning -> fixers
+  fixers -> validators
+  validators -> rereview
+}
+
+iteration_check: CRITICAL/HIGH\nremain? {
+  shape: diamond
+  style.fill: "#fef3c7"
 }
 
 present: Present Report\nEXIT SUCCESS {
@@ -151,3 +180,10 @@ report -> fix_decision
 
 fix_decision -> phase4: YES
 fix_decision -> present: NO
+
+phase4 -> iteration_check
+iteration_check -> phase4.planning: YES {
+  style.stroke: "#ef4444"
+  style.stroke-width: 2
+}
+iteration_check -> present: NO

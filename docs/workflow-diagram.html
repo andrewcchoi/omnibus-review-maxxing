@@ -359,31 +359,72 @@
     </section>
 
     <section id="ralph-loop">
-        <h2>Phase 4: Ralph Loop Fix Cycle</h2>
+        <h2>Phase 4: Parallel Fix Cycle</h2>
 
         <div class="decision">
             <h3>Entry Conditions</h3>
-            <p>Phase 4 is triggered if ANY of these conditions are true:</p>
-            <ul>
-                <li>User specified <code>--fix</code> flag</li>
-                <li>CRITICAL severity issues detected</li>
-                <li>HIGH severity issues detected</li>
-            </ul>
+            <p>Phase 4 is triggered when user specifies <code>--fix</code> flag.</p>
+            <p><strong>Key principle:</strong> No confirmation prompts. All fixes proceed automatically with complete solutions.</p>
         </div>
 
         <div class="diagram">
-            <img src="../diagrams/svg/ralph-loop.svg"
-                 alt="Ralph Loop fix cycle: Initialize queue, pop issues, apply fixes, run tests, mark fixed or rollback, repeat until done"
+            <img src="omnibus-workflow.svg"
+                 alt="Complete fix workflow: Planning, parallel fixers, parallel validators, re-review loop"
                  role="img">
+        </div>
+
+        <div class="phase">
+            <h3>Step 1: Planning</h3>
+            <ul>
+                <li>Group findings by file</li>
+                <li>Generate YAML fix plan per file</li>
+                <li>Include architecture context from CLAUDE.md</li>
+                <li>Define planned fix for each finding</li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <h3>Step 2: Parallel Fixers</h3>
+            <p>Spawn one <code>omnibus-fixer</code> subagent per file (in parallel):</p>
+            <ul>
+                <li>Each fixer receives ONLY its file + fix plan (minimal context)</li>
+                <li>Apply COMPLETE fixes - no shortcuts</li>
+                <li>Fixes must fit existing architecture</li>
+                <li>Update plan with status and actual_fix</li>
+                <li>Document divergence reasons if deviating from plan</li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <h3>Step 3: Parallel Validators</h3>
+            <p>Spawn one <code>omnibus-validator</code> subagent per fixed file (in parallel):</p>
+            <ul>
+                <li>Read updated fix plan + git diff</li>
+                <li>Verify each fix was actually applied</li>
+                <li>Check fixes are COMPLETE (not shortcuts)</li>
+                <li>Validate architecture alignment</li>
+                <li>Assess divergence reasons</li>
+                <li>Flag regressions or new issues</li>
+            </ul>
+        </div>
+
+        <div class="phase">
+            <h3>Step 4: Re-Review</h3>
+            <ul>
+                <li>Run 6 review agents on modified files only</li>
+                <li>Aggregate new findings</li>
+                <li>If CRITICAL/HIGH remain: loop back to Planning</li>
+                <li>If max iterations reached: exit with summary</li>
+            </ul>
         </div>
 
         <div class="success-path">
             <h3>Success Path</h3>
             <ul>
                 <li>All CRITICAL/HIGH issues resolved</li>
-                <li>All tests passing</li>
-                <li>Changes staged and ready to commit</li>
-                <li>Summary report with fixes applied</li>
+                <li>All fixes validated as complete</li>
+                <li>Changes ready to commit</li>
+                <li>Fix plans archived for audit trail</li>
             </ul>
         </div>
 
@@ -391,21 +432,21 @@
             <h3>Failure Scenarios</h3>
             <ul>
                 <li><strong>Max iterations:</strong> Some issues remain unfixed after limit reached</li>
-                <li><strong>Test failures:</strong> Fix caused regression, rolled back</li>
-                <li><strong>Manual intervention needed:</strong> Issue requires human judgment</li>
-                <li><strong>Conflicting fixes:</strong> Fixing A breaks B</li>
+                <li><strong>Validation failure:</strong> Fixer applied incomplete fix, flagged by validator</li>
+                <li><strong>Regression:</strong> Fix introduced new issues, caught by re-review</li>
+                <li><strong>Cross-file dependency:</strong> Fix requires changes to multiple files</li>
             </ul>
             <p><strong>Result:</strong> Report remaining issues for manual resolution</p>
         </div>
 
         <div class="phase">
-            <h3>Progress Tracking</h3>
-            <p>During fix cycle, user sees live updates:</p>
+            <h3>Context Isolation Benefit</h3>
+            <p>Each subagent starts with fresh context:</p>
             <ul>
-                <li>Iteration X of Y</li>
-                <li>Currently fixing: [issue description]</li>
-                <li>Running tests...</li>
-                <li>Resolved: X/Y issues (Z remaining)</li>
+                <li>Fixers receive only: file + plan + architecture context</li>
+                <li>Validators receive only: file + plan + git diff</li>
+                <li>No compaction needed during fix loop</li>
+                <li>Scales to any number of files</li>
             </ul>
         </div>
     </section>
