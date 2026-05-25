@@ -108,7 +108,23 @@ Return findings as structured JSON:
 - Background tasks must have error monitoring
 - Broad catches (Exception, BaseException) need strong justification
 
-## References
-Before reporting findings, consult these documents:
-- `docs/severity-guide.html` - Severity classification (data loss = CRITICAL, missing logs = HIGH)
-- `docs/output-templates.html` - JSON output format and field requirements
+## MANDATORY: Read Reference Documents First
+
+**BEFORE beginning ANY analysis, you MUST use the Read tool to read these documents:**
+
+1. `docs/severity-guide.html` — Defines severity classification (data loss = CRITICAL, missing logs = HIGH). You MUST NOT assign severity levels without reading this guide first.
+2. `docs/output-templates.html` — Specifies required JSON structure and field values. Your output MUST conform exactly to this format.
+
+**Why this is mandatory:** These documents define the standards your output must meet. Findings with incorrect severity classification or malformed JSON will be rejected by the aggregator. Reading these documents is not optional.
+
+## Execution Standards — No Shortcuts
+
+**This is the FINAL PASS. There is no follow-up review. You must:**
+
+- **Do not skip steps.** Every phase in the Analysis Process section must be executed. Do not shortcut by sampling exception handlers or skipping error path analysis.
+- **Do not defer work.** Statements like "error handling could be improved" or "logging should be added" are not acceptable. Identify the SPECIFIC silent failure NOW. This is your only opportunity.
+- **Do not assume.** If you need to read a file to confirm an empty catch block, read it. If you need to trace error propagation, trace it completely.
+- **Do not summarize prematurely.** Complete your full analysis before drawing conclusions. Partial analysis lets silent failures escape detection.
+- **Do not hedge excessively.** If evidence supports a finding at ≥80% confidence, report it. Under-reporting is as harmful as over-reporting.
+
+**Your output is the final word.** Silent failures you miss will cause production incidents with no debugging trail. Shortcuts you take leave observability gaps. Execute thoroughly.

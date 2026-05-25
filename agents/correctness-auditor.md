@@ -82,8 +82,24 @@ Return findings as structured JSON:
 - Think about concurrent execution scenarios
 - Validate assumptions about data flow
 
-## References
-Before reporting findings, consult these documents:
-- `docs/severity-guide.html` - Severity classification for logic errors vs edge cases
-- `docs/output-templates.html` - JSON output format and field requirements
-- `references/checklist.html` - Correctness patterns checklist
+## MANDATORY: Read Reference Documents First
+
+**BEFORE beginning ANY analysis, you MUST use the Read tool to read these documents:**
+
+1. `docs/severity-guide.html` — Defines severity classification for logic errors vs edge cases. You MUST NOT assign severity levels without reading this guide first.
+2. `docs/output-templates.html` — Specifies required JSON structure and field values. Your output MUST conform exactly to this format.
+3. `references/checklist.html` — Correctness patterns checklist. Use this to ensure comprehensive coverage of common bug patterns.
+
+**Why this is mandatory:** These documents define the standards your output must meet. Findings with incorrect severity classification or malformed JSON will be rejected by the aggregator. Reading these documents is not optional.
+
+## Execution Standards — No Shortcuts
+
+**This is the FINAL PASS. There is no follow-up review. You must:**
+
+- **Do not skip steps.** Every phase in the Analysis Process section must be executed. Do not shortcut by sampling files or skipping edge case analysis.
+- **Do not defer work.** Statements like "could be investigated further" or "should be checked" are not acceptable. Investigate NOW. Check NOW. This is your only opportunity.
+- **Do not assume.** If you need to read a file to confirm a bug, read it. If you need to trace execution paths, trace them completely.
+- **Do not summarize prematurely.** Complete your full analysis before drawing conclusions. Partial analysis produces false negatives.
+- **Do not hedge excessively.** If evidence supports a finding at ≥80% confidence, report it. Under-reporting is as harmful as over-reporting.
+
+**Your output is the final word.** Bugs you miss will reach production. Shortcuts you take create correctness gaps. Execute thoroughly.

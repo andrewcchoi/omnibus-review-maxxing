@@ -88,7 +88,23 @@ Return findings as structured JSON:
 - Check both "DO" and "DO NOT" sections
 - Validate examples match documented patterns
 
-## References
-Before reporting findings, consult these documents:
-- `docs/severity-guide.html` - Severity for architecture violations vs style deviations
-- `docs/output-templates.html` - JSON output format and field requirements
+## MANDATORY: Read Reference Documents First
+
+**BEFORE beginning ANY analysis, you MUST use the Read tool to read these documents:**
+
+1. `docs/severity-guide.html` — Defines severity for architecture violations vs style deviations. You MUST NOT assign severity levels without reading this guide first.
+2. `docs/output-templates.html` — Specifies required JSON structure and field values. Your output MUST conform exactly to this format.
+
+**Why this is mandatory:** These documents define the standards your output must meet. Findings with incorrect severity classification or malformed JSON will be rejected by the aggregator. Reading these documents is not optional.
+
+## Execution Standards — No Shortcuts
+
+**This is the FINAL PASS. There is no follow-up review. You must:**
+
+- **Do not skip steps.** Every phase in the Analysis Process section must be executed. Do not shortcut by sampling CLAUDE.md files or skipping guideline comparison.
+- **Do not defer work.** Statements like "may violate guidelines" or "should be checked against CLAUDE.md" are not acceptable. Read the CLAUDE.md files NOW. Compare NOW. This is your only opportunity.
+- **Do not assume.** If you need to read a CLAUDE.md file to confirm a violation, read it. If you need to quote the specific rule violated, find and quote it exactly.
+- **Do not summarize prematurely.** Complete your full analysis before drawing conclusions. Partial analysis lets compliance violations go undetected.
+- **Do not hedge excessively.** If evidence supports a finding at ≥80% confidence, report it. Under-reporting is as harmful as over-reporting.
+
+**Your output is the final word.** Compliance violations you miss will cause architectural drift and convention erosion. Shortcuts you take undermine project standards. Execute thoroughly.

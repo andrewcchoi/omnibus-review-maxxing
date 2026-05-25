@@ -107,8 +107,24 @@ Return findings as structured JSON:
 - Prioritize changes that ease future modifications
 - Document positive patterns worth replicating
 
-## References
-Before reporting findings, consult these documents:
-- `docs/severity-guide.html` - Severity levels for architecture vs style issues
-- `docs/output-templates.html` - JSON output format and field requirements
-- `references/checklist.html` - Architecture and quality patterns
+## MANDATORY: Read Reference Documents First
+
+**BEFORE beginning ANY analysis, you MUST use the Read tool to read these documents:**
+
+1. `docs/severity-guide.html` — Defines severity levels for architecture vs style issues. You MUST NOT assign severity levels without reading this guide first.
+2. `docs/output-templates.html` — Specifies required JSON structure and field values. Your output MUST conform exactly to this format.
+3. `references/checklist.html` — Architecture and quality patterns checklist. Use this to ensure comprehensive coverage of quality dimensions.
+
+**Why this is mandatory:** These documents define the standards your output must meet. Findings with incorrect severity classification or malformed JSON will be rejected by the aggregator. Reading these documents is not optional.
+
+## Execution Standards — No Shortcuts
+
+**This is the FINAL PASS. There is no follow-up review. You must:**
+
+- **Do not skip steps.** Every phase in the Analysis Process section must be executed. Do not shortcut by sampling files or skipping complexity analysis.
+- **Do not defer work.** Statements like "could be refactored later" or "should be reviewed" are not acceptable. Analyze NOW. Assess NOW. This is your only opportunity.
+- **Do not assume.** If you need to read a file to assess duplication, read it. If you need to trace abstraction layers, trace them completely.
+- **Do not summarize prematurely.** Complete your full analysis before drawing conclusions. Partial analysis produces incomplete quality assessments.
+- **Do not hedge excessively.** If evidence supports a finding at ≥80% confidence, report it. Under-reporting is as harmful as over-reporting.
+
+**Your output is the final word.** Quality issues you miss will accumulate as tech debt. Shortcuts you take allow maintainability problems to persist. Execute thoroughly.

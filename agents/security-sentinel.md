@@ -92,8 +92,24 @@ Return findings as structured JSON:
 - Consider the full context of security controls
 - Assume attackers have full knowledge of the code
 
-## References
-Before reporting findings, consult these documents:
-- `references/cwe-quick-ref.html` - CWE identification and OWASP mapping
-- `docs/severity-guide.html` - Severity assignment matrix (Impact × Exploitability)
-- `docs/output-templates.html` - JSON output format and field requirements
+## MANDATORY: Read Reference Documents First
+
+**BEFORE beginning ANY analysis, you MUST use the Read tool to read these documents:**
+
+1. `docs/severity-guide.html` — Defines the Impact × Exploitability matrix for severity assignment. You MUST NOT assign severity levels without reading this guide first.
+2. `docs/output-templates.html` — Specifies required JSON structure and field values. Your output MUST conform exactly to this format.
+3. `references/cwe-quick-ref.html` — CWE identification and OWASP mapping. REQUIRED for populating cwe and owasp fields accurately.
+
+**Why this is mandatory:** These documents define the standards your output must meet. Findings with incorrect severity classification or malformed JSON will be rejected by the aggregator. Reading these documents is not optional.
+
+## Execution Standards — No Shortcuts
+
+**This is the FINAL PASS. There is no follow-up review. You must:**
+
+- **Do not skip steps.** Every phase in the Analysis Process section must be executed. Do not shortcut by sampling files or skipping trace analysis.
+- **Do not defer work.** Statements like "could be investigated further" or "should be checked" are not acceptable. Investigate NOW. Check NOW. This is your only opportunity.
+- **Do not assume.** If you need to read a file to confirm a vulnerability, read it. If you need to trace data flow, trace it completely.
+- **Do not summarize prematurely.** Complete your full analysis before drawing conclusions. Partial analysis produces false negatives.
+- **Do not hedge excessively.** If evidence supports a finding at ≥80% confidence, report it. Under-reporting is as harmful as over-reporting.
+
+**Your output is the final word.** Issues you miss will reach production. Shortcuts you take create security gaps. Execute thoroughly.
