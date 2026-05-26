@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Theatre Detection Guide - Omnibus Review</title>
+    <style>
+        :root {
+            --critical: #dc3545;
+            --high: #fd7e14;
+            --medium: #ffc107;
+            --low: #0d6efd;
+            --success: #198754;
+            --background: #f8f9fa;
+            --text: #212529;
+            --border: #dee2e6;
+            --code-bg: #f5f5f5;
+            --theatre: #9c27b0;
+            --real: #198754;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--background);
+            margin: 0;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            color: var(--text);
+        }
+
+        h2 {
+            color: var(--text);
+            margin-top: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        h3 {
+            margin-top: 20px;
+        }
+
+        section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            border-left: 4px solid var(--critical);
+            color: #721c24;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border-left: 4px solid var(--medium);
+            color: #856404;
+        }
+
+        .alert-info {
+            background: #cfe2ff;
+            border-left: 4px solid var(--low);
+            color: #084298;
+        }
+
+        .pattern-card {
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid var(--border);
+            background: white;
+        }
+
+        .pattern-card h3 {
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pattern-number {
+            background: var(--theatre);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .code-compare {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        @media (max-width: 768px) {
+            .code-compare {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        .code-block.theatre {
+            border-top: 3px solid var(--critical);
+        }
+
+        .code-block.real {
+            border-top: 3px solid var(--success);
+        }
+
+        .code-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .code-label.theatre {
+            color: var(--critical);
+        }
+
+        .code-label.real {
+            color: var(--success);
+        }
+
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        code {
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .detection-criteria {
+            background: #e7f5ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+
+        .detection-criteria h4 {
+            margin: 0 0 10px 0;
+            color: var(--low);
+            font-size: 14px;
+        }
+
+        .detection-criteria ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .badge-theatre { background: var(--theatre); }
+        .badge-critical { background: var(--critical); }
+        .badge-high { background: var(--high); }
+        .badge-medium { background: var(--medium); color: var(--text); }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--background);
+            font-weight: 600;
+        }
+
+        .severity-card {
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-left: 5px solid;
+        }
+
+        .severity-critical {
+            background: #f8d7da;
+            border-color: var(--critical);
+        }
+
+        .severity-high {
+            background: #ffe5d0;
+            border-color: var(--high);
+        }
+
+        .severity-medium {
+            background: #fff3cd;
+            border-color: var(--medium);
+        }
+
+        .nav-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--low);
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+
+        .workflow-diagram {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .workflow-step {
+            display: inline-block;
+            padding: 15px 25px;
+            border-radius: 8px;
+            margin: 10px;
+            font-weight: 600;
+        }
+
+        .workflow-arrow {
+            display: inline-block;
+            font-size: 24px;
+            color: var(--border);
+            margin: 0 10px;
+        }
+
+        .step-theatre {
+            background: #f3e5f5;
+            border: 2px solid var(--theatre);
+            color: var(--theatre);
+        }
+
+        .step-coverage {
+            background: #e8f5e9;
+            border: 2px solid var(--success);
+            color: var(--success);
+        }
+
+        .metrics-box {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .metric {
+            background: var(--code-bg);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--critical);
+        }
+
+        .metric-value.good {
+            color: var(--success);
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        footer {
+            margin-top: 40px;
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+            border-top: 1px solid var(--border);
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            section, header {
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Test Theatre Detection Guide</h1>
+        <p>Identify tests that pass but provide no real protection</p>
+    </header>
+
+    <a href="../README.html" class="nav-link">&larr; Back to README</a>
+
+    <section>
+        <h2>What is Test Theatre?</h2>
+
+        <div class="alert alert-danger">
+            <strong>Theatre tests are worse than no tests.</strong> They create false confidence that your code is protected while providing zero actual verification. Features fail in production despite "passing tests."
+        </div>
+
+        <p>
+            Test theatre refers to tests that appear to validate functionality but actually verify nothing meaningful.
+            They inflate coverage metrics, pass CI checks, and give developers a false sense of security.
+        </p>
+
+        <h3>The False Confidence Problem</h3>
+        <div class="metrics-box">
+            <div class="metric">
+                <div class="metric-value">80%</div>
+                <div class="metric-label">Reported Coverage</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value">45%</div>
+                <div class="metric-label">Real Coverage</div>
+            </div>
+            <div class="metric">
+                <div class="metric-value good">0</div>
+                <div class="metric-label">Bugs Caught</div>
+            </div>
+        </div>
+
+        <p>
+            When theatre tests are counted as coverage, metrics become meaningless. A team might believe
+            they have 80% coverage while actually having 45% real protection. Bugs slip through the
+            "safety net" because the net has invisible holes.
+        </p>
+    </section>
+
+    <section>
+        <h2>Why Theatre Detection Must Run First</h2>
+
+        <div class="workflow-diagram">
+            <div class="workflow-step step-theatre">1. Theatre Detector</div>
+            <span class="workflow-arrow">&rarr;</span>
+            <div class="workflow-step step-coverage">2. Coverage Analyzer</div>
+        </div>
+
+        <div class="alert alert-warning">
+            <strong>Critical Dependency:</strong> The <code>test-theatre-detector</code> agent MUST run before
+            <code>test-coverage-analyzer</code>. Coverage analysis cannot be accurate if theatre tests are
+            counted as real coverage.
+        </div>
+
+        <p>The dependency exists because:</p>
+        <ul>
+            <li>Coverage analyzer maps tests to production code</li>
+            <li>If a theatre test exists for a function, coverage analyzer marks it as "covered"</li>
+            <li>But theatre tests provide NO actual coverage</li>
+            <li>Result: inflated metrics, false confidence, bugs in production</li>
+        </ul>
+
+        <p><strong>Correct workflow:</strong></p>
+        <ol>
+            <li>Theatre detector identifies fake tests and outputs a list</li>
+            <li>Coverage analyzer receives the list and excludes those tests from metrics</li>
+            <li>Coverage metrics now reflect reality</li>
+        </ol>
+    </section>
+
+    <section>
+        <h2>Theatre Test Patterns</h2>
+
+        <div class="pattern-card">
+            <h3><span class="pattern-number">1</span> Hardcoded Input/Output</h3>
+            <p>Tests where both input and expected output are literals with trivial relationship.</p>
+
+            <div class="code-compare">
+                <div class="code-block theatre">
+                    <div class="code-label theatre">Theatre</div>
+<pre># What if add() always returns 5?
+def test_add():
+    assert add(2, 3) == 5</pre>
+                </div>
+                <div class="code-block real">
+                    <div class="code-label real">Real Test</div>
+<pre># Tests actual behavior
+def test_add():
+    assert add(0, 0) == 0
+    assert add(-1, 1) == 0
+    assert add(100, 200) == 300</pre>
+                </div>
+            </div>
+
+            <div class="detection-criteria">
+                <h4>Detection Criteria</h4>
+                <ul>
+                    <li>Single assertion with literal input and literal output</li>
+                    <li>No variation in inputs tested</li>
+                    <li>No edge cases (zero, negative, boundary values)</li>
+                    <li>Relationship between input and output is trivial</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="pattern-card">
+            <h3><span class="pattern-number">2</span> Empty Test Body</h3>
+            <p>Tests that are placeholders, never implemented.</p>
+
+            <div class="code-block theatre">
+                <div class="code-label theatre">Theatre</div>
+<pre>def test_payment_processing():
+    pass
+
+def test_user_validation():
+    ...
+
+def test_order_flow():
+    """TODO: implement"""</pre>
+            </div>
+
+            <div class="detection-criteria">
+                <h4>Detection Criteria</h4>
+                <ul>
+                    <li>Test body is <code>pass</code>, <code>...</code>, or only docstring/comments</li>
+                    <li>No actual code execution</li>
+                    <li>No assertions</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="pattern-card">
+            <h3><span class="pattern-number">3</span> Always-Pass Assertions</h3>
+            <p>Assertions that can never fail regardless of code behavior.</p>
+
+            <div class="code-block theatre">
+                <div class="code-label theatre">Theatre</div>
+<pre>def test_something():
+    result = process_data()
+    assert True
+    assert 1 == 1
+    assert "test" == "test"
+    assert result or True  # Short-circuit always passes
+
+def test_config():
+    assert 5 > 3  # Tests nothing about your code</pre>
+            </div>
+
+            <div class="detection-criteria">
+                <h4>Detection Criteria</h4>
+                <ul>
+                    <li><code>assert True</code></li>
+                    <li><code>assert &lt;literal&gt; == &lt;literal&gt;</code></li>
+                    <li><code>assert &lt;expr&gt; or True</code></li>
+                    <li>Assertions with no connection to code under test</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="pattern-card">
+            <h3><span class="pattern-number">4</span> Over-Mocked Tests</h3>
+            <p>Everything is mocked, so the test verifies mock configuration, not real behavior.</p>
+
+            <div class="code-compare">
+                <div class="code-block theatre">
+                    <div class="code-label theatre">Theatre</div>
+<pre>@patch('module.database')
+@patch('module.cache')
+@patch('module.api_client')
+@patch('module.validator')
+def test_process(mock_val, mock_api,
+                 mock_cache, mock_db):
+    mock_db.get.return_value = {"id": 1}
+    mock_api.fetch.return_value = {"data": "x"}
+
+    result = process_item(1)
+
+    # Just testing mock config!
+    assert result == {"id": 1, "data": "x"}</pre>
+                </div>
+                <div class="code-block real">
+                    <div class="code-label real">Real Test</div>
+<pre># Integration test - real database
+def test_process(test_db):
+    test_db.insert({"id": 1, "value": 100})
+
+    result = process_item(1)
+
+    # Tests actual transformation
+    assert result["computed"] == 200
+    assert result["processed_at"] is not None</pre>
+                </div>
+            </div>
+
+            <div class="detection-criteria">
+                <h4>Detection Criteria</h4>
+                <ul>
+                    <li>3+ mocks/patches in single test</li>
+                    <li>Return values configured for all mocks</li>
+                    <li>Assertion verifies the exact mock return values</li>
+                    <li>No real code path exercised</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="pattern-card">
+            <h3><span class="pattern-number">5</span> Mock-Only Assertions</h3>
+            <p>Tests that only verify mocks were called, not that results are correct.</p>
+
+            <div class="code-compare">
+                <div class="code-block theatre">
+                    <div class="code-label theatre">Theatre</div>
+<pre>def test_send_email():
+    with patch('mailer.send') as mock:
+        notify_user(user_id=1)
+        # Called, but correct content?
+        mock.assert_called_once()</pre>
+                </div>
+                <div class="code-block real">
+                    <div class="code-label real">Real Test</div>
+<pre>def test_send_email():
+    with patch('mailer.send') as mock:
+        notify_user(user_id=1)
+        mock.assert_called_once_with(
+            to="user@example.com",
+            subject="Welcome",
+            body=contains("Hello John")
+        )</pre>
+                </div>
+            </div>
+
+            <div class="detection-criteria">
+                <h4>Detection Criteria</h4>
+                <ul>
+                    <li>Only <code>assert_called()</code> or <code>assert_called_once()</code> without arguments</li>
+                    <li>No verification of call arguments</li>
+                    <li>No verification of side effects or return values</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="pattern-card">
+            <h3><span class="pattern-number">6</span> Tautological Tests</h3>
+            <p>Tests that verify the test setup, not the code behavior.</p>
+
+            <div class="code-block theatre">
+                <div class="code-label theatre">Theatre</div>
+<pre># Testing that mock returns what you set
+def test_get_user():
+    mock_repo = Mock()
+    mock_repo.get.return_value = User(id=1, name="Test")
+
+    service = UserService(mock_repo)
+    user = service.get_user(1)
+
+    assert user.name == "Test"  # You set this!
+
+# Testing fixture data
+def test_user_fixture(user_fixture):
+    assert user_fixture.email == "test@test.com"</pre>
+            </div>
+
+            <div class="detection-criteria">
+                <h4>Detection Criteria</h4>
+                <ul>
+                    <li>Assertion verifies exact value that was configured in mock</li>
+                    <li>No transformation or business logic between mock and assertion</li>
+                    <li>Testing fixture data instead of code behavior</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="pattern-card">
+            <h3><span class="pattern-number">7</span> Exception Swallowing</h3>
+            <p>Tests that catch and ignore exceptions, so they pass even when code fails.</p>
+
+            <div class="code-block theatre">
+                <div class="code-label theatre">Theatre</div>
+<pre># Swallows real failures
+def test_dangerous_operation():
+    try:
+        result = dangerous_operation()
+        assert result is not None
+    except Exception:
+        pass  # Test passes even on failure!
+
+# Masks the failure
+def test_api_call():
+    try:
+        response = api.call()
+    except:
+        response = None
+    # Always passes!
+    assert response is None or response.ok</pre>
+            </div>
+
+            <div class="detection-criteria">
+                <h4>Detection Criteria</h4>
+                <ul>
+                    <li><code>except</code> block with <code>pass</code> or empty body</li>
+                    <li><code>except Exception</code> or bare <code>except</code> that doesn't re-raise</li>
+                    <li>Assertion after except that allows None/failure case</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="pattern-card">
+            <h3><span class="pattern-number">8</span> Conditional Assertions</h3>
+            <p>Assertions inside conditionals that may never execute.</p>
+
+            <div class="code-block theatre">
+                <div class="code-label theatre">Theatre</div>
+<pre># Assertion might never run
+def test_feature_flag():
+    result = process()
+    if result.success:
+        assert result.data is not None
+    # What if success is always False?
+
+# Environment-dependent
+def test_integration():
+    if os.getenv('RUN_INTEGRATION'):
+        result = integration_call()
+        assert result.ok
+    # Passes with no assertions in CI!</pre>
+            </div>
+
+            <div class="detection-criteria">
+                <h4>Detection Criteria</h4>
+                <ul>
+                    <li><code>assert</code> inside <code>if</code> block</li>
+                    <li>No <code>else</code> clause with assertion or failure</li>
+                    <li>Condition may commonly be False</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="pattern-card">
+            <h3><span class="pattern-number">9</span> Trivial Assertions</h3>
+            <p>Assertions that almost never fail in practice.</p>
+
+            <div class="code-compare">
+                <div class="code-block theatre">
+                    <div class="code-label theatre">Theatre</div>
+<pre>def test_returns_something():
+    result = fetch_data()
+    # Almost always true
+    assert result is not None
+    assert isinstance(result, dict)
+    assert len(result) > 0
+
+def test_user_has_fields():
+    user = get_user(1)
+    # Field exists, but valid?
+    assert hasattr(user, 'email')</pre>
+                </div>
+                <div class="code-block real">
+                    <div class="code-label real">Real Test</div>
+<pre>def test_fetch_user_data():
+    result = fetch_data(user_id=1)
+    assert result["user_id"] == 1
+    assert result["email"] == "test@example.com"
+    assert result["created_at"] < datetime.now()
+
+def test_user_email_valid():
+    user = get_user(1)
+    assert "@" in user.email
+    assert user.email.endswith(".com")</pre>
+                </div>
+            </div>
+
+            <div class="detection-criteria">
+                <h4>Detection Criteria</h4>
+                <ul>
+                    <li><code>is not None</code> as only assertion</li>
+                    <li><code>isinstance()</code> checks without value verification</li>
+                    <li><code>hasattr()</code> or <code>in</code> checks without value assertions</li>
+                    <li><code>len() > 0</code> without content verification</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="pattern-card">
+            <h3><span class="pattern-number">10</span> Snapshot Theatre</h3>
+            <p>Snapshot tests that just verify "code hasn't changed" without verifying correctness.</p>
+
+            <div class="code-block theatre">
+                <div class="code-label theatre">Theatre</div>
+<pre># If original was wrong, this passes forever
+def test_render_component(snapshot):
+    result = render_component(data)
+    assert result == snapshot
+
+# 10,000 line snapshot nobody reads
+def test_api_response(snapshot):
+    response = api.get('/users')
+    snapshot.assert_match(response.json())</pre>
+            </div>
+
+            <div class="detection-criteria">
+                <h4>Detection Criteria</h4>
+                <ul>
+                    <li>Snapshot tests for complex objects (>100 lines)</li>
+                    <li>Snapshot tests without clear expected behavior</li>
+                    <li>Snapshots that were created without review</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Severity Classification</h2>
+
+        <p>Theatre test severity depends on what the test <em>claims</em> to cover:</p>
+
+        <div class="severity-card severity-critical">
+            <h4><span class="badge badge-critical">CRITICAL</span></h4>
+            <p>Theatre test claims to cover critical functionality:</p>
+            <ul>
+                <li>Payment processing</li>
+                <li>Authentication/authorization</li>
+                <li>Data integrity operations</li>
+                <li>Security controls</li>
+            </ul>
+            <p><strong>Impact:</strong> Critical bugs reach production with "passing tests"</p>
+        </div>
+
+        <div class="severity-card severity-high">
+            <h4><span class="badge badge-high">HIGH</span></h4>
+            <p>Theatre test covers important features:</p>
+            <ul>
+                <li>Core business logic</li>
+                <li>User-facing workflows</li>
+                <li>API endpoints</li>
+                <li>Data transformations</li>
+            </ul>
+            <p><strong>Impact:</strong> Major functionality may fail despite passing tests</p>
+        </div>
+
+        <div class="severity-card severity-medium">
+            <h4><span class="badge badge-medium">MEDIUM</span></h4>
+            <p>Theatre test covers secondary functionality:</p>
+            <ul>
+                <li>Edge case handling</li>
+                <li>Error messages</li>
+                <li>Logging/monitoring</li>
+                <li>Configuration handling</li>
+            </ul>
+            <p><strong>Impact:</strong> Non-critical issues may go undetected</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Theatre vs. Legitimate Patterns</h2>
+
+        <p>Not all simple tests are theatre. Here's how to distinguish:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Pattern</th>
+                    <th>Theatre</th>
+                    <th>Legitimate</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Single assertion</td>
+                    <td><code>assert add(2,3) == 5</code> (only case)</td>
+                    <td><code>assert add(2,3) == 5</code> (one of many cases)</td>
+                </tr>
+                <tr>
+                    <td>Not None check</td>
+                    <td>Only assertion in test</td>
+                    <td>Guard before value assertions</td>
+                </tr>
+                <tr>
+                    <td>Mock usage</td>
+                    <td>4+ mocks, testing mock config</td>
+                    <td>1-2 mocks for isolation, testing real logic</td>
+                </tr>
+                <tr>
+                    <td>Exception handling</td>
+                    <td><code>except: pass</code></td>
+                    <td><code>with pytest.raises(ValueError):</code></td>
+                </tr>
+                <tr>
+                    <td>Snapshot test</td>
+                    <td>Large, never-reviewed snapshots</td>
+                    <td>Small, intentional golden files</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>Output Format</h2>
+
+        <p>The theatre detector produces JSON output for consumption by the coverage analyzer:</p>
+
+        <div class="code-block">
+<pre>{
+  "agent": "test-theatre-detector",
+  "theatre_metrics": {
+    "total_tests_scanned": 150,
+    "theatre_tests_found": 12,
+    "theatre_percentage": 8.0,
+    "patterns_found": {
+      "empty-body": 2,
+      "trivial-assertion": 5,
+      "over-mocked": 3,
+      "hardcoded": 2
+    }
+  },
+  "findings": [
+    {
+      "id": "theatre-001",
+      "severity": "CRITICAL",
+      "category": "trivial-assertion",
+      "location": {
+        "file": "tests/test_payments.py",
+        "line_start": 45
+      },
+      "title": "Theatre test for payment processing",
+      "claimed_coverage": "process_payment() function",
+      "actual_coverage": "None"
+    }
+  ]
+}</pre>
+        </div>
+
+        <p>The coverage analyzer uses this output to:</p>
+        <ul>
+            <li>Exclude theatre tests from coverage calculations</li>
+            <li>Report accurate "effective coverage" metrics</li>
+            <li>Flag functions that appear covered but aren't</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>Fixing Theatre Tests</h2>
+
+        <div class="alert alert-info">
+            <strong>A theatre test should either be fixed or deleted.</strong> A deleted test is honest.
+            A theatre test is a lie.
+        </div>
+
+        <h3>Fix Strategies by Pattern</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Pattern</th>
+                    <th>Fix Strategy</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Empty body</td>
+                    <td>Implement the test or delete it</td>
+                </tr>
+                <tr>
+                    <td>Hardcoded I/O</td>
+                    <td>Add multiple cases, edge cases, parameterization</td>
+                </tr>
+                <tr>
+                    <td>Always-pass</td>
+                    <td>Replace with meaningful assertions on actual behavior</td>
+                </tr>
+                <tr>
+                    <td>Over-mocked</td>
+                    <td>Reduce mocks, test real integration, or write integration tests</td>
+                </tr>
+                <tr>
+                    <td>Mock-only</td>
+                    <td>Assert on call arguments and/or return values</td>
+                </tr>
+                <tr>
+                    <td>Tautological</td>
+                    <td>Assert on transformations, not passthrough values</td>
+                </tr>
+                <tr>
+                    <td>Exception swallow</td>
+                    <td>Use <code>pytest.raises()</code> for expected exceptions</td>
+                </tr>
+                <tr>
+                    <td>Conditional</td>
+                    <td>Remove condition or add else with <code>pytest.fail()</code></td>
+                </tr>
+                <tr>
+                    <td>Trivial</td>
+                    <td>Add specific value assertions</td>
+                </tr>
+                <tr>
+                    <td>Snapshot theatre</td>
+                    <td>Break into specific assertions or review/approve snapshots</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <footer>
+        <p><a href="../README.html">Back to README</a> | <a href="severity-guide.html">Severity Guide</a> | <a href="agent-overview.html">Agent Overview</a></p>
+    </footer>
+</body>
+</html>

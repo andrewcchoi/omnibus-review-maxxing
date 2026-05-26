@@ -224,14 +224,14 @@
     <a href="../README.html" class="nav-link">← Back to README</a>
 
     <section>
-        <h2>The Eight Specialist Agents</h2>
+        <h2>The Nine Specialist Agents</h2>
         <p>
-            Omnibus Review employs eight specialized AI agents. Six <strong>review agents</strong> analyze code
+            Omnibus Review employs nine specialized AI agents. Seven <strong>review agents</strong> analyze code
             in parallel, each powered by Claude Opus 4.5 with ultrathink extended thinking. Two <strong>fix agents</strong>
             handle the iterative fixing process with context isolation.
         </p>
 
-        <h3>Review Agents (6)</h3>
+        <h3>Review Agents (7)</h3>
 
         <div class="agent-grid">
             <div class="agent-card agent-security">
@@ -326,6 +326,31 @@
                 <p><strong>Expertise:</strong> Big-O analysis, profiling patterns, database optimization</p>
             </div>
 
+            <div class="agent-card" style="border-color: #e67e22;">
+                <div class="agent-header">
+                    <div class="agent-icon" style="background: #e67e22;">🎭</div>
+                    <div>
+                        <h3>Theatre Detector</h3>
+                        <div class="model-badge">Claude Opus 4.5 + ultrathink</div>
+                    </div>
+                </div>
+                <p><strong>Mission:</strong> Identify tests that pass but verify nothing (must run BEFORE coverage analyzer)</p>
+                <p><strong>Focus Areas:</strong></p>
+                <ul>
+                    <li>Hardcoded input/output tests</li>
+                    <li>Empty test bodies (<code>pass</code>, <code>...</code>)</li>
+                    <li>Always-pass assertions (<code>assert True</code>)</li>
+                    <li>Over-mocked tests (3+ patches)</li>
+                    <li>Mock-only assertions</li>
+                    <li>Tautological tests</li>
+                    <li>Exception swallowing</li>
+                    <li>Conditional assertions</li>
+                    <li>Trivial assertions</li>
+                </ul>
+                <p><strong>Expertise:</strong> False confidence detection, test anti-patterns</p>
+                <p><strong>Critical:</strong> Must run before Test Evaluator to exclude theatre from coverage metrics</p>
+            </div>
+
             <div class="agent-card agent-test">
                 <div class="agent-header">
                     <div class="agent-icon icon-test">🧪</div>
@@ -334,7 +359,7 @@
                         <div class="model-badge">Claude Opus 4.5 + ultrathink</div>
                     </div>
                 </div>
-                <p><strong>Mission:</strong> Assess test coverage, quality, and maintainability</p>
+                <p><strong>Mission:</strong> Assess test coverage, quality, and maintainability (excludes theatre tests)</p>
                 <p><strong>Focus Areas:</strong></p>
                 <ul>
                     <li>Test coverage gaps</li>
@@ -347,6 +372,7 @@
                     <li>Mock overuse/misuse</li>
                 </ul>
                 <p><strong>Expertise:</strong> Testing pyramid, TDD principles, test patterns</p>
+                <p><strong>Dependency:</strong> Requires Theatre Detector output to exclude fake tests from metrics</p>
             </div>
 
             <div class="agent-card agent-style">
@@ -523,6 +549,29 @@
             <strong>Recommendation:</strong> Add index: <code>CREATE INDEX idx_logs_user_id ON logs(user_id)</code>
         </div>
 
+        <h3>Theatre Detector</h3>
+        <div class="example-box" style="border-color: #e67e22;">
+            <strong>Finding:</strong> Theatre Test - Trivial Assertion<br>
+            <strong>Location:</strong> <code>tests/test_payment.py:45</code><br>
+            <strong>Severity:</strong> CRITICAL<br>
+            <strong>Description:</strong> Test claims to verify payment processing but only checks result is not None.
+            Payment could return wrong amount, wrong status, or corrupt data and test would still pass.<br>
+            <code>def test_payment(): result = process_payment(100); assert result is not None</code><br>
+            <strong>Claimed Coverage:</strong> process_payment() - critical payment flow<br>
+            <strong>Actual Coverage:</strong> None - only verifies function returns something<br>
+            <strong>Recommendation:</strong> Add meaningful assertions: <code>assert result.status == 'completed'; assert result.amount == 100.00</code>
+        </div>
+
+        <div class="example-box" style="border-color: #e67e22;">
+            <strong>Finding:</strong> Theatre Test - Over-Mocked<br>
+            <strong>Location:</strong> <code>tests/test_order_service.py:78</code><br>
+            <strong>Severity:</strong> HIGH<br>
+            <strong>Description:</strong> Test uses 4 mocks and only verifies that the mocked return values pass through.
+            No real code is exercised - just testing mock configuration.<br>
+            <code>@patch('db') @patch('cache') @patch('api') @patch('validator') def test_order(): ...</code><br>
+            <strong>Recommendation:</strong> Reduce mocks and test real integration, or write separate integration tests
+        </div>
+
         <h3>Test Evaluator</h3>
         <div class="example-box test-example">
             <strong>Finding:</strong> Missing Edge Case Tests<br>
@@ -574,6 +623,7 @@
             <ul>
                 <li><strong>Security + Correctness:</strong> SQL injection (security) + unvalidated input (correctness) = high confidence finding</li>
                 <li><strong>Performance + Architecture:</strong> N+1 queries (performance) + tight coupling (architecture) = systemic issue</li>
+                <li><strong>Theatre + Test:</strong> Theatre tests (theatre detector) filtered before coverage analysis (test evaluator) = accurate metrics</li>
                 <li><strong>Test + Correctness:</strong> Missing tests (test) + edge case bugs (correctness) = coverage gap</li>
                 <li><strong>Style + Architecture:</strong> God object (architecture) + poor naming (style) = maintainability problem</li>
             </ul>

@@ -247,14 +247,15 @@
             <li><a href="docs/output-templates.html">Output Templates</a> - Report format examples</li>
             <li><a href="references/checklist.html">Review Checklist</a> - Pre/post review steps</li>
             <li><a href="references/cwe-quick-ref.html">CWE Quick Reference</a> - Security vulnerability guide</li>
+            <li><a href="docs/test-theatre-guide.html">Test Theatre Guide</a> - Theatre test detection patterns</li>
         </ul>
     </nav>
 
     <section>
         <h2>Overview</h2>
         <p>
-            Omnibus Review is a sophisticated multi-agent code review system that orchestrates eight specialized
-            AI agents to perform deep, comprehensive analysis of codebases. Six review agents analyze code in parallel,
+            Omnibus Review is a sophisticated multi-agent code review system that orchestrates nine specialized
+            AI agents to perform deep, comprehensive analysis of codebases. Seven review agents analyze code in parallel,
             while two fix agents handle automated remediation with validation. Unlike traditional review tools,
             it employs parallel specialist agents working independently with advanced reasoning capabilities
             to catch issues that single-pass reviews miss.
@@ -263,7 +264,7 @@
         <div class="feature-grid">
             <div class="feature-card">
                 <h3>Multi-Agent Architecture</h3>
-                <p>Eight specialized agents: six for review (parallel), two for fixing (fixer + validator per file).</p>
+                <p>Nine specialized agents: seven for review (parallel), two for fixing (fixer + validator per file).</p>
             </div>
             <div class="feature-card">
                 <h3>Advanced Reasoning</h3>
@@ -284,7 +285,7 @@
         <h2>Architecture</h2>
         <div class="architecture" style="text-align: center; padding: 20px;">
             <img src="diagrams/svg/architecture-full.svg"
-                 alt="Complete 4-phase architecture: Pre-review validation, Parallel specialist review with 6 agents, Aggregation and prioritization, Fix cycle"
+                 alt="Complete 4-phase architecture: Pre-review validation, Parallel specialist review with 7 agents, Aggregation and prioritization, Fix cycle"
                  role="img"
                  style="max-width: 100%; height: auto;">
         </div>
@@ -402,7 +403,7 @@
     <section>
         <h2>Specialist Agents</h2>
 
-        <h3>Review Agents (6)</h3>
+        <h3>Review Agents (7)</h3>
         <table>
             <thead>
                 <tr>
@@ -431,6 +432,11 @@
                     <td><strong>Performance Auditor</strong></td>
                     <td>N+1 queries, memory leaks, algorithmic complexity, caching</td>
                     <td>Missing indexes, inefficient loops, resource exhaustion</td>
+                </tr>
+                <tr>
+                    <td><strong>Test Theatre Detector</strong></td>
+                    <td style="color: #e67e22;">Theatre tests: hardcoded, empty, always-pass, over-mocked</td>
+                    <td>Hardcoded assertions, empty test bodies, mocks replacing all logic</td>
                 </tr>
                 <tr>
                     <td><strong>Test Evaluator</strong></td>
@@ -513,7 +519,7 @@
             <li><strong>Planning:</strong> Group findings by file, generate YAML fix plan per file</li>
             <li><strong>Parallel Fixers:</strong> Spawn one <code>omnibus-fixer</code> subagent per file (all run in parallel)</li>
             <li><strong>Parallel Validators:</strong> Spawn one <code>omnibus-validator</code> subagent per fixed file (all run in parallel)</li>
-            <li><strong>Re-Review:</strong> Run 6 review agents on modified files only</li>
+            <li><strong>Re-Review:</strong> Run 7 review agents on modified files only (theatre detection runs before coverage analysis)</li>
             <li><strong>Iteration:</strong> If CRITICAL/HIGH remain, loop back to Planning</li>
             <li><strong>Exit:</strong> All issues fixed OR max iterations reached</li>
         </ol>
@@ -637,6 +643,7 @@
             <li><a href="docs/output-templates.html">Output Templates</a> - Report examples</li>
             <li><a href="references/checklist.html">Review Checklist</a> - Preparation steps</li>
             <li><a href="references/cwe-quick-ref.html">CWE Quick Reference</a> - Security guide</li>
+            <li><a href="docs/test-theatre-guide.html">Test Theatre Guide</a> - Theatre test detection</li>
         </ul>
     </section>
 

@@ -8,13 +8,25 @@ tools: ["Read", "Grep", "Bash"]
 
 # Test Coverage Analyzer
 
+## MANDATORY: Run Theatre Detector First
+
+**CRITICAL DEPENDENCY:** The `test-theatre-detector` agent MUST run before this agent. Theatre tests (tests that pass but verify nothing) poison coverage metrics. If theatre tests are counted as real coverage, your analysis will report inflated numbers.
+
+**Before this agent runs, ensure:**
+1. `test-theatre-detector` has completed analysis
+2. You have the list of identified theatre tests
+3. You will EXCLUDE theatre tests from coverage calculations
+
+**If theatre detector has not run:** Flag this to the orchestrator. Do not proceed with coverage analysis until theatre tests are identified.
+
 ## MANDATORY: Read Reference Documents First
 
 **BEFORE beginning ANY analysis, you MUST use the Read tool to read these documents:**
 
 1. `docs/severity-guide.html` — Defines severity for test gaps (core functionality = CRITICAL, edge cases = MEDIUM). You MUST NOT assign severity levels without reading this guide first.
 2. `docs/output-templates.html` — Specifies required JSON structure and field values. Your output MUST conform exactly to this format.
-3. `references/checklist.html` — Test coverage checklist. Use this to ensure comprehensive identification of coverage gaps.
+3. `docs/test-theatre-guide.html` — Understand theatre test patterns so you can recognize if any were missed by the theatre detector.
+4. `references/checklist.html` — Test coverage checklist. Use this to ensure comprehensive identification of coverage gaps.
 
 **Why this is mandatory:** These documents define the standards your output must meet. Findings with incorrect severity classification or malformed JSON will be rejected by the aggregator. Reading these documents is not optional.
 
@@ -150,7 +162,9 @@ Return findings as structured JSON:
     "new_functions": 5,
     "tested_functions": 3,
     "untested_functions": 2,
-    "edge_cases_covered": 60
+    "edge_cases_covered": 60,
+    "theatre_tests_excluded": 2,
+    "effective_coverage_note": "2 theatre tests excluded from coverage calculation per test-theatre-detector findings"
   },
   "strengths": ["Good edge case coverage in UserService", "Strong assertions in auth tests"]
 }
@@ -164,3 +178,5 @@ Return findings as structured JSON:
 - Check for both positive and negative test cases
 - Look for brittle tests (hard-coded IDs, timestamp dependencies)
 - Ensure tests follow project testing patterns from CLAUDE.md
+- **EXCLUDE theatre tests from coverage calculations** — tests flagged by test-theatre-detector do not count as coverage
+- If you find additional theatre tests during analysis, note them but do not count as coverage

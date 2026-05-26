@@ -1,10 +1,10 @@
 # Omnibus Review Maxxing
 
-A comprehensive Claude Code review plugin combining 6 specialized agents with Ralph Loop iterative fixing.
+A comprehensive Claude Code review plugin combining 7 specialized agents with Ralph Loop iterative fixing.
 
 ## Features
 
-- **6 Specialized Review Agents** - Each focused on a specific domain
+- **7 Specialized Review Agents** - Each focused on a specific domain
 - **Opus + Ultrathink** - Maximum reasoning depth for all reviews
 - **JSON Output** - Structured, aggregatable findings
 - **Ralph Loop Integration** - Iterative fixing until issues resolved
@@ -29,18 +29,21 @@ A comprehensive Claude Code review plugin combining 6 specialized agents with Ra
 /omnibus-review --fix --opus
 ```
 
-## The 8 Agents
+## The 9 Agents
 
-### Review Agents (6)
+### Review Agents (7)
 
 | Agent | Focus | Color |
 |-------|-------|-------|
 | **correctness-auditor** | Bugs, logic errors, null handling, race conditions | 🔴 Red |
 | **security-sentinel** | OWASP vulnerabilities, injection, auth flaws | 🔴 Red |
 | **claude-md-compliance** | CLAUDE.md guideline violations | 🟡 Yellow |
+| **test-theatre-detector** | Theatre tests: hardcoded, empty, always-pass, over-mocked | 🟡 Yellow |
 | **test-coverage-analyzer** | Test gaps, missing edge cases, weak assertions | 🟢 Green |
 | **silent-failure-hunter** | Empty catches, swallowed errors, missing logging | 🟡 Yellow |
 | **code-quality-reviewer** | Duplication, complexity, naming, patterns | 🔵 Blue |
+
+**Note:** `test-theatre-detector` MUST run before `test-coverage-analyzer`. Theatre tests inflate coverage metrics and must be identified first.
 
 ### Fix Agents (2)
 
@@ -67,7 +70,7 @@ A comprehensive Claude Code review plugin combining 6 specialized agents with Ra
 When `--fix` is enabled, the review uses a parallel subagent architecture for context isolation:
 
 ```
-Review (6 agents) → Aggregate → Group by file →
+Review (7 agents) → Aggregate → Group by file →
     ┌─ omnibus-fixer (file A) ─┐
     ├─ omnibus-fixer (file B) ─┼→ Updated fix plans
     └─ omnibus-fixer (file C) ─┘
@@ -89,7 +92,7 @@ Review (6 agents) → Aggregate → Group by file →
 
 ### Iteration Loop
 
-1. Run comprehensive review (6 agents)
+1. Run comprehensive review (7 agents, theatre detector runs first)
 2. Generate fix plans per file
 3. Dispatch parallel fixer subagents (one per file)
 4. Dispatch parallel validator subagents (verify fixes)
@@ -124,7 +127,8 @@ Rich HTML documentation is included in the plugin:
 | [README.html](README.html) | Main documentation with architecture diagram |
 | [docs/workflow-diagram.html](docs/workflow-diagram.html) | Visual 4-phase workflow |
 | [docs/severity-guide.html](docs/severity-guide.html) | Color-coded severity classification |
-| [docs/agent-overview.html](docs/agent-overview.html) | 6 agents with responsibilities |
+| [docs/test-theatre-guide.html](docs/test-theatre-guide.html) | Theatre test detection patterns |
+| [docs/agent-overview.html](docs/agent-overview.html) | 7 agents with responsibilities |
 | [docs/output-templates.html](docs/output-templates.html) | Output format examples |
 | [references/checklist.html](references/checklist.html) | Pre/post review checklists |
 | [references/cwe-quick-ref.html](references/cwe-quick-ref.html) | Security CWE reference |

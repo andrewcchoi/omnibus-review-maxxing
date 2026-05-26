@@ -24,7 +24,7 @@ review_phase: Review Phase {
   }
 
   dispatch: {
-    label: "Dispatch 6 Review Agents\n(parallel)"
+    label: "Dispatch 7 Review Agents\n(parallel, with dependency)"
     shape: hexagon
   }
 
@@ -43,6 +43,10 @@ review_phase: Review Phase {
       shape: person
       style.fill: "#93c5fd"
     }
+    theatre: Test Theatre Detector {
+      shape: person
+      style.fill: "#e67e22"
+    }
     coverage: Test Coverage {
       shape: person
       style.fill: "#93c5fd"
@@ -55,6 +59,12 @@ review_phase: Review Phase {
       shape: person
       style.fill: "#93c5fd"
     }
+  }
+
+  # Dependency: theatre detector feeds coverage analyzer
+  agents.theatre -> agents.coverage: "theatre list" {
+    style.stroke: "#e67e22"
+    style.stroke-width: 2
   }
 
   aggregate: {
@@ -72,12 +82,13 @@ review_phase: Review Phase {
   dispatch -> agents.correctness
   dispatch -> agents.security
   dispatch -> agents.compliance
-  dispatch -> agents.coverage
+  dispatch -> agents.theatre
   dispatch -> agents.silent
   dispatch -> agents.quality
   agents.correctness -> aggregate
   agents.security -> aggregate
   agents.compliance -> aggregate
+  agents.theatre -> aggregate
   agents.coverage -> aggregate
   agents.silent -> aggregate
   agents.quality -> aggregate

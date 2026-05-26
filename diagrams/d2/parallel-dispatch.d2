@@ -1,5 +1,6 @@
 # Parallel Agent Dispatch
-# 6 agents running concurrently during Phase 2
+# 7 agents running concurrently during Phase 2
+# Theatre Detector runs first, feeds Test Coverage Analyzer
 
 direction: down
 
@@ -22,7 +23,7 @@ context: Context Package {
 }
 
 agents: {
-  label: "6 Agents (Parallel)"
+  label: "7 Agents (Parallel with Dependency)"
   style.fill: "#f8f9fa"
   style.stroke: "#0d6efd"
   style.stroke-width: 2
@@ -43,7 +44,11 @@ agents: {
     style.fill: "#fd7e14"
     style.font-color: white
   }
-  test: Test\nEvaluator {
+  theatre: Test Theatre\nDetector {
+    style.fill: "#e67e22"
+    style.font-color: white
+  }
+  test: Test Coverage\nAnalyzer {
     style.fill: "#198754"
     style.font-color: white
   }
@@ -51,6 +56,25 @@ agents: {
     style.fill: "#0d6efd"
     style.font-color: white
   }
+
+  # Dependency: Theatre detector feeds coverage analyzer
+  theatre -> test: "theatre list" {
+    style.stroke: "#e67e22"
+    style.stroke-width: 2
+  }
+}
+
+dependency_note: {
+  label: |md
+    **Dependency Note**
+    Theatre Detector runs first (or in parallel)
+    and provides a list of theatre tests to
+    Test Coverage Analyzer for validation.
+  |
+  style.fill: "#fff3cd"
+  style.stroke: "#e67e22"
+  style.font-size: 11
+  near: bottom-left
 }
 
 collect: Collect Results {

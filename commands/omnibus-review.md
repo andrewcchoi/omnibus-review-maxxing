@@ -159,9 +159,9 @@ Store the key sections relevant for code review:
 
 When dispatching the claude-md-compliance agent, include `CLAUDE_MD_SOURCE` in the context string so it can report accurate rule sources.
 
-## Phase 2: Dispatch 6 Parallel Review Agents
+## Phase 2: Dispatch 7 Parallel Review Agents
 
-Launch all 6 specialized review agents in parallel. Each agent receives:
+Launch all 7 specialized review agents. Each agent receives:
 - The list of files to review
 - Relevant CLAUDE.md content
 - Clear instructions to return JSON output in the specified format
@@ -253,7 +253,31 @@ Check for violations of architecture patterns, coding standards, and DO NOT rule
 Only include findings with confidence >= 80.
 ```
 
-### Agent 4: Test Coverage Analyzer
+### Agent 4: Test Theatre Detector
+
+Use Agent tool with:
+- `agent: "test-theatre-detector"`
+- `model: "opus"`
+- `options: { "ultrathink": true }`
+
+Provide context:
+```
+Scan these test files for theatre tests:
+${FILE_LIST}
+
+Project context from CLAUDE.md:
+${CLAUDE_MD_RELEVANT_SECTIONS}
+
+Return findings as JSON array with the same structure as above.
+
+Identify theatre tests: hardcoded inputs/outputs, empty bodies, always-pass assertions, over-mocked tests, tautological tests, exception swallowing.
+Only include findings with confidence >= 80.
+```
+
+**IMPORTANT**: This agent MUST complete before Test Coverage Analyzer runs.
+Its output (list of theatre tests) is passed to the coverage analyzer to exclude from metrics.
+
+### Agent 5: Test Coverage Analyzer
 
 Use Agent tool with:
 - `agent: "test-coverage-analyzer"`
@@ -274,7 +298,9 @@ Identify untested functions, missing edge cases, and inadequate test isolation.
 Only include findings with confidence >= 80.
 ```
 
-### Agent 5: Silent Failure Hunter
+**Dependency**: Wait for Theatre Detector (Agent 4) to complete. Exclude identified theatre tests from coverage calculations.
+
+### Agent 6: Silent Failure Hunter
 
 Use Agent tool with:
 - `agent: "silent-failure-hunter"`
@@ -295,7 +321,7 @@ Look for swallowed exceptions, missing error handling, unchecked return values, 
 Only include findings with confidence >= 80.
 ```
 
-### Agent 6: Code Quality Reviewer
+### Agent 7: Code Quality Reviewer
 
 Use Agent tool with:
 - `agent: "code-quality-reviewer"`
@@ -325,20 +351,22 @@ After all agents complete, collect their JSON outputs:
    - Second attempt: If no fenced blocks found, scan for raw JSON patterns (starts with `{` or `[`, ends with `}` or `]`)
    - Extract the "findings" array from each agent's response
 
-2. **Merge all findings arrays**: Combine findings from all 6 agents into one array
+2. **Merge all findings arrays**: Combine findings from all 7 agents into one array
 
-3. **Filter by confidence**: Remove any findings with confidence < 80
+3. **For theatre detector**: Extract list of theatre test locations to pass to coverage analyzer.
+
+4. **Filter by confidence**: Remove any findings with confidence < 80
    - Note: This is defensive programming. Agents are instructed to only return findings >= 80 confidence, 
      but this filter ensures quality in case an agent doesn't follow instructions precisely
 
-4. **Deduplicate by location**: 
+5. **Deduplicate by location**: 
    - Two findings are duplicates if they have:
      - Same file path
      - Overlapping line ranges (line_start to line_end)
    - When duplicates found, keep the one with highest confidence
    - If confidence is equal, keep the one with higher severity (critical > high > medium > low)
 
-5. **Sort by severity**: Order final list as critical, high, medium, low
+6. **Sort by severity**: Order final list as critical, high, medium, low
 
 Store the final aggregated findings in a structured format for Phase 4.
 

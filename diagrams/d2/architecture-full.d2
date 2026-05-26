@@ -50,7 +50,7 @@ build_context: Build Context\nfor Agents {
 }
 
 # Phase 2
-phase2: "PHASE 2: PARALLEL SPECIALIST REVIEW (6 AGENTS)" {
+phase2: "PHASE 2: PARALLEL SPECIALIST REVIEW (7 AGENTS)" {
   style.fill: "#e7f1ff"
   style.stroke: "#0d6efd"
   style.stroke-width: 2
@@ -72,13 +72,24 @@ phase2: "PHASE 2: PARALLEL SPECIALIST REVIEW (6 AGENTS)" {
     style.fill: "#fd7e14"
     style.font-color: white
   }
-  test: Test {
+  theatre: Theatre\nDetector {
+    style.fill: "#e67e22"
+    style.font-color: white
+  }
+  test: Test\nCoverage {
     style.fill: "#198754"
     style.font-color: white
   }
   code_style: Style {
     style.fill: "#0d6efd"
     style.font-color: white
+  }
+
+  # Dependency: Theatre detector must complete before Test Coverage
+  theatre -> test: "must complete\nbefore" {
+    style.stroke: "#e67e22"
+    style.stroke-width: 2
+    style.stroke-dash: 3
   }
 }
 
@@ -146,7 +157,7 @@ phase4: "PHASE 4: PARALLEL FIX CYCLE" {
 
   rereview: Re-Review {
     style.fill: "#c7d2fe"
-    label: "Run 6 agents\non modified files"
+    label: "Run 7 agents\non modified files"
   }
 
   planning -> fixers

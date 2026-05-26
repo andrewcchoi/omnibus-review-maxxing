@@ -26,11 +26,14 @@ version: 1.0.0
 6. `references/cwe-quick-ref.html` — Security vulnerability classifications.
    You MUST reference correct CWE IDs for security findings.
 
+7. `docs/test-theatre-guide.html` — Theatre test detection patterns.
+   You MUST understand theatre tests to ensure accurate coverage metrics.
+
 **Why this is mandatory:** These documents define the standards for severity classification, output format, and workflow execution. Inconsistent severity or malformed output will compromise the aggregated report quality. Reading these documents is not optional.
 
 # Omnibus Review Skill
 
-Orchestrates a comprehensive code review by dispatching 6 specialized review agents in parallel, aggregating their findings, and optionally entering an iterative fixing loop.
+Orchestrates a comprehensive code review by dispatching 7 specialized review agents in parallel, aggregating their findings, and optionally entering an iterative fixing loop.
 
 ## When to Use
 
@@ -70,7 +73,7 @@ Trigger this skill when the user requests:
 The omnibus review executes in phases:
 
 ### Review Mode (default)
-1. **Dispatch Phase**: Spawns 6 parallel review agents, each running Opus 4.5 with ultrathink mode
+1. **Dispatch Phase**: Spawns 7 parallel review agents, each running Opus 4.5 with ultrathink mode
 2. **Aggregation Phase**: Collects and consolidates findings into structured JSON
 3. **Formatting Phase**: Transforms aggregated data into human-readable report with severity-based grouping
 
@@ -80,17 +83,18 @@ The omnibus review executes in phases:
 6. **Validation Phase**: Spawns parallel `omnibus-validator` subagents (verify fixes)
 7. **Re-Review Phase**: Runs review agents on modified files, loops if issues remain
 
-## The 8 Agents
+## The 9 Agents
 
-### Review Agents (6)
+### Review Agents (7)
 Each agent focuses on a specific quality dimension:
 
 1. **Correctness Agent**: Logic errors, race conditions, data consistency, algorithmic correctness
 2. **Security Agent**: Vulnerabilities (OWASP Top 10), injection flaws, auth/authz issues, crypto misuse
 3. **Compliance Agent**: CLAUDE.md guidelines, architecture patterns, coding standards
-4. **Testing Agent**: Test coverage gaps, missing edge cases, test quality, fixture issues
-5. **Error Handling Agent**: Exception handling, error propagation, logging, graceful degradation
-6. **Quality Agent**: Code style, maintainability, documentation, performance, best practices
+4. **Theatre Agent**: Theatre test detection - hardcoded tests, empty bodies, always-pass assertions, over-mocking
+5. **Testing Agent**: Test coverage gaps, missing edge cases, test quality, fixture issues (depends on Theatre Agent)
+6. **Error Handling Agent**: Exception handling, error propagation, logging, graceful degradation
+7. **Quality Agent**: Code style, maintainability, documentation, performance, best practices
 
 ### Fix Agents (2)
 7. **Omnibus Fixer**: Applies COMPLETE fixes per file following fix plan, documents divergence
@@ -153,7 +157,7 @@ Reviews entire diff, fixes all findings iteratively, exits when confidence >= 80
 ```bash
 /omnibus-review backend/src/auth/
 ```
-All 6 agents run, but you can manually focus on security/correctness findings in the report.
+All 7 agents run, but you can manually focus on security/correctness findings in the report.
 
 **Scenario 3: Post-PR review before merge**
 ```bash

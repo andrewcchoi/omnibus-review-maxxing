@@ -246,6 +246,7 @@ git diff --cached --stat
             <li>Update existing tests if you changed behavior</li>
             <li>Verify test names are descriptive and follow project conventions</li>
             <li>Check that test coverage hasn't decreased</li>
+            <li>Verify tests are not theatre tests (tests that pass but don't verify behavior)</li>
         </ul>
 
         <div class="command-box">
@@ -255,6 +256,34 @@ coverage html  # Generate HTML report
 
 # JavaScript/TypeScript test coverage
 npm test -- --coverage
+        </div>
+
+        <h3>Theatre Test Detection</h3>
+        <p>Ensure tests provide real protection, not false confidence.</p>
+
+        <ul class="checklist checklist-critical">
+            <li>No tests with <code>assert True</code> or <code>assert 1 == 1</code></li>
+            <li>No tests with empty bodies (<code>pass</code> or <code>...</code>)</li>
+            <li>No tests that only check <code>is not None</code> for critical functions</li>
+        </ul>
+
+        <ul class="checklist checklist-high">
+            <li>No over-mocked tests (3+ patches testing mock config, not behavior)</li>
+            <li>No hardcoded input/output tests with single trivial assertion</li>
+            <li>No exception-swallowing tests (<code>except: pass</code>)</li>
+        </ul>
+
+        <ul class="checklist">
+            <li>Mock assertions verify arguments, not just <code>assert_called()</code></li>
+            <li>Conditional assertions have else clauses or fail paths</li>
+            <li>Snapshot tests are reviewed and intentional</li>
+            <li>Theatre detector runs BEFORE coverage analyzer</li>
+        </ul>
+
+        <div class="warning">
+            <strong>Theatre Tests:</strong> Tests that pass but provide false confidence are worse
+            than no tests at all. They hide missing coverage and can allow bugs to slip through.
+            The omnibus-review theatre detector identifies these patterns automatically.
         </div>
     </section>
 
